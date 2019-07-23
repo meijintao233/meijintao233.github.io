@@ -5,8 +5,8 @@ tags:
 ---
 
 > 原文地址：[Anomalies in JavaScript arrow functions](https://blog.logrocket.com/anomalies-in-javascript-arrow-functions/)
->
 > 原文作者：[Glad Chinda](https://blog.logrocket.com/author/gladchinda/)
+> 译者: [charlie mei](https://meijintao233.github.io/)
 
 ## 介绍
 
