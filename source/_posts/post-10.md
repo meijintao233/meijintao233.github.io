@@ -2,6 +2,8 @@
 title: "[译]JavaScript箭头函数中的不规则"
 date: 2019-07-21 14:00:41
 tags:
+  - 翻译
+  - 前端
 ---
 
 > 原文地址：[Anomalies in JavaScript arrow functions](https://blog.logrocket.com/anomalies-in-javascript-arrow-functions/)
