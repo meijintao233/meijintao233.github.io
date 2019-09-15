@@ -87,7 +87,7 @@ services: #服务列表
 git可以用来做分布式版本控制，不同于基于中心化的版本控制，git记录数据的时候记录的是增量数据，即是改变的数据才会进行上传更新。
 
 了解git首先从commit对象，branch，HEAD指针对象开始，每一次的commit都会产生一个commit对象，commit对象会有两个指针，一个指针指向的是file tree的根节点，然后每个file是tree的一个结点，每个文件夹则是另一个tree的根结点，commit的另一个指针则会指向最新的commit，根据commit不断向前推进形成一条链，commitA -> commitB -> commitC 以此类推，而每个commit有一个唯一的hash值标记，这条链就是一条branch分支，每个git文件必定会有一个master分支，而分支则是由分支指针确定，分支指针会指向各自分支的最新提交，而HEAD则是指向分支指针，代表着目前在哪条分支上进行操作。
-```javascript```
+```javascript
 commitA -> commitB -> commitC -> commitD -> commitE -> commitF -> commitG -> commitH 
 						^                                            \          ^
 						|                                             \         |

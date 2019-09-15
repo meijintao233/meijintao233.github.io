@@ -25,7 +25,7 @@ const scores = [
 const maxScore = Math.max(...scores);
 
 // Arrow Function as .map() callback
-scores.map(score => +(score / maxScore).toFixed(2));
+scores.map((score) => +(score / maxScore).toFixed(2));
 ```
 
 一眼过去，箭头函数可能看起来像可以被用于或者定义在每个常规函数也能这样的地方，但事实并不是这样的。出于非常好的原因，箭头函数并不是恰好表现得像常规函数一样。也许箭头函数可以被认为是不规则的 Javascript 函数。
@@ -33,6 +33,8 @@ scores.map(score => +(score / maxScore).toFixed(2));
 尽管箭头函数有一个相当简单的语法，这不是本文的重点。本文的目标是揭示箭头函数不同于常规函数的主要行为方式以及怎样将这些知识用于开发者的优势。
 
 请注意：在本文中，我会用常规函数或者常规 Javascript 函数的术语表示传统的 Javascript 函数语句或者使用 function 关键字定义的表达式。
+
+ <!-- more -->
 
 ## TL;DR
 
@@ -399,7 +401,7 @@ this.closest("form");
 这时，你用了一个常规 Javascript 函数作为事件处理器。如果你使用全新的箭头函数语法更改函数定义，会发生什么呢？
 
 ```javascript
-const processFormData = evt => {
+const processFormData = (evt) => {
   evt.preventDefault();
 
   const form = this.closest("form");
