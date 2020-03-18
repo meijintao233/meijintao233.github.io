@@ -81,6 +81,8 @@ deploy:
   type: git
   repository: git@github.com:meijintao233/meijintao233.github.io.git
   branch: master
+  name: meijintao233
+  email: meijintao233@126.com
 
 search:
   path: search.xml
