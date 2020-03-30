@@ -54,9 +54,10 @@ index_generator:
   order_by: -date
 
 # Category & Tag
-default_category: uncategorized
+default_category: default
 category_map:
-tag_map:
+
+tag_map: 前端:frontend node:node v8:v8
 
 # Date / Time format
 ## Hexo uses Moment.js to parse and display date
@@ -89,3 +90,21 @@ search:
   field: post
   format: html
   limit: 10000
+
+menu: #菜单设置为 菜单名: /菜单目录 || 菜单图标名字
+  home: / || home
+  about: /about/ || user
+  tags: /tags/ || tags
+  categories: /categories/ || th
+  archives: /archives/ || archive
+  commonweal: /404/ || heartbeat
+
+menu_settings:
+  icons: true #显示图标
+  badges: true #显示统计信息
+
+nav:
+  home: /
+  about: /about
+  tags: /tags
+  archives: /archives
