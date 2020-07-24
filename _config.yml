@@ -90,6 +90,7 @@ search:
   field: post
   format: html
   limit: 10000
+  
 
 menu: #菜单设置为 菜单名: /菜单目录 || 菜单图标名字
   home: / || home
