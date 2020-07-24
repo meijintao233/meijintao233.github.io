@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="wepy是腾讯内部团队开源的一个类vue框架，相对于原生小程序，这个框架对开发流程有了更高的抽象，也降低了初学者的开发难度，可是对于vue开发者来说，开发体验也降低了。不过wepy解决了以下问题:  无法引用npm包的问题 如何进行编译 更有效的组织代码，以及组件间的通信 request的并发限制， 原生频繁使用setdata，会有性能问题 如何划分作用域 提供了slot">
+<meta property="og:type" content="article">
+<meta property="og:title" content="wepy浅析">
+<meta property="og:url" content="https://github.com/meijintao233/meijintao233.github.io/post-1/index.html">
+<meta property="og:site_name" content="charliemei">
+<meta property="og:description" content="wepy是腾讯内部团队开源的一个类vue框架，相对于原生小程序，这个框架对开发流程有了更高的抽象，也降低了初学者的开发难度，可是对于vue开发者来说，开发体验也降低了。不过wepy解决了以下问题:  无法引用npm包的问题 如何进行编译 更有效的组织代码，以及组件间的通信 request的并发限制， 原生频繁使用setdata，会有性能问题 如何划分作用域 提供了slot">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-07-24T11:23:07.428Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="wepy浅析">
+<meta name="twitter:description" content="wepy是腾讯内部团队开源的一个类vue框架，相对于原生小程序，这个框架对开发流程有了更高的抽象，也降低了初学者的开发难度，可是对于vue开发者来说，开发体验也降低了。不过wepy解决了以下问题:  无法引用npm包的问题 如何进行编译 更有效的组织代码，以及组件间的通信 request的并发限制， 原生频繁使用setdata，会有性能问题 如何划分作用域 提供了slot">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://github.com/meijintao233/meijintao233.github.io/post-1/">
+
+
+
+
+
+  <title>wepy浅析 | charliemei</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">charliemei</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            links
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/meijintao233/meijintao233.github.io/post-1/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="charliemei">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="charliemei">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">wepy浅析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-29T12:14:11+08:00">
+                2018-07-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>wepy是腾讯内部团队开源的一个类vue框架，相对于原生小程序，这个框架对开发流程有了更高的抽象，也降低了初学者的开发难度，可是对于vue开发者来说，开发体验也降低了。<strong>不过wepy解决了以下问题:</strong></p>
+<ul>
+<li>无法引用npm包的问题</li>
+<li>如何进行编译</li>
+<li>更有效的组织代码，以及组件间的通信</li>
+<li>request的并发限制，</li>
+<li>原生频繁使用setdata，会有性能问题</li>
+<li>如何划分作用域</li>
+<li>提供了slot</li>
+</ul>
+<a id="more"></a>
+<h4 id="一、wepy是什么"><a href="#一、wepy是什么" class="headerlink" title="一、wepy是什么"></a>一、wepy是什么</h4><p>wepy是腾讯内部团队开源的一个类vue框架，相对于原生小程序，这个框架对开发流程有了更高的抽象，也降低了初学者的开发难度，可是对于vue开发者来说，开发体验也降低了。</p>
+<h4 id="二、wepy解决了什么问题"><a href="#二、wepy解决了什么问题" class="headerlink" title="二、wepy解决了什么问题"></a>二、wepy解决了什么问题</h4><ul>
+<li>1.无法引用npm包的问题</li>
+<li>2.如何进行编译</li>
+<li>3.更有效的组织代码，以及组件间的通信</li>
+<li>4.request的并发限制，</li>
+<li>5.原生频繁使用setdata，会有性能问题</li>
+<li>6.如何划分作用域</li>
+<li>7.提供了slot<h4 id="三、wepy不足之处"><a href="#三、wepy不足之处" class="headerlink" title="三、wepy不足之处"></a>三、wepy不足之处</h4></li>
+<li>1.脏检查有可能带来性能消耗，因为页面切换过程中会执行一次脏检查，如果开发者知道页面没变动，可以手动停止脏检查机制（可能可以通过设置$$phase的值解决）</li>
+<li>2.repeat中无法使用watch</li>
+<li>3.双向绑定过多会出现性能问题</li>
+<li>4.一个组件的数据发生变化，全部组件的都会刷新一次，这个在无限滚动中容易出现性能问题（如果repeat过程中能分配不同的实例可能能解决）<h4 id="四、解决方案"><a href="#四、解决方案" class="headerlink" title="四、解决方案"></a>四、解决方案</h4></li>
+<li><p>1.针对原生小程序不支持npm包的问题，wepy做了改进，对package.json中的依赖包，wepy模仿require的加载机制，将文件拷贝到node_modules中，针对一些特殊的包进行了hack处理，替换了相关字段，这个是在complie-script的resolveDeps方法中解决的。</p>
+</li>
+<li><p>2.compile根据不同的文件名后缀调用不同的方法进行编译，compile-wpy调用resolveWpy方法进行了一系列的处理，把代码变换成xmldom进行操作，将wpy文件中的config放入rst.config中，样式放入rst.style，将components放入rst.template.components（通过正则表达式获取），而components中的props以及events属性，则放入rst.script.code中，最后拆解style、template、script，生成rst对象</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">rst = &#123;</span><br><span class="line">  moduleId: moduleId,</span><br><span class="line">  style: [],</span><br><span class="line">  template: &#123;</span><br><span class="line">    code: <span class="string">''</span>,</span><br><span class="line">    src: <span class="string">''</span>,</span><br><span class="line">    type: <span class="string">''</span>,</span><br><span class="line">    components: &#123;&#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">  script: &#123;</span><br><span class="line">    code: <span class="string">''</span>,</span><br><span class="line">    src: <span class="string">''</span>,</span><br><span class="line">    type: <span class="string">''</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">  config: &#123;&#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>3.原生小程序中，一个page下有四个文件<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">-4.原生小程序中有并发请求限制，而wepy则通过RequestMQ方法解决了这个问题，主要是通过维护一个待请求队列和请求未返回队列，以及一个映射对象，并且通过递归进行轮询，如果超过了则等待前面的请求回来再发起下一个请求。</span><br><span class="line">```javascript</span><br><span class="line">//单例模式</span><br><span class="line">let RequestMQ = &#123;</span><br><span class="line">    map: &#123;&#125;,//映射对象</span><br><span class="line">    mq: [],//等待发起请求</span><br><span class="line">    running: [],//正在进行的请求</span><br><span class="line">    MAX_REQUEST: 5,//最大并发数</span><br><span class="line">    push (param) &#123;</span><br><span class="line">        param.t = +new Date();//生成时间戳，作为请求的识别码</span><br><span class="line">        while ((this.mq.indexOf(param.t) &gt; -1 || this.running.indexOf(param.t) &gt; -1)) &#123;</span><br><span class="line">            //如果时间戳存在，则进行处理，保证识别码是唯一的</span><br><span class="line">            param.t += Math.random() * 10 &gt;&gt; 0;//这里右移0是为了取整</span><br><span class="line">        &#125;</span><br><span class="line">        this.mq.push(param.t);//将请求放入等待发起请求的队列中</span><br><span class="line">        this.map[param.t] = param;//用map对象记录这个请求，以时间戳作为标记</span><br><span class="line">    &#125;,</span><br><span class="line">    next () &#123;</span><br><span class="line">        let me = this;//保存该作用域</span><br><span class="line">        if (this.mq.length === 0)//如果没有需要发起请求，那么直接返回</span><br><span class="line">            return;</span><br><span class="line">        if (this.running.length &lt; this.MAX_REQUEST - 1) &#123;</span><br><span class="line">          //正在发起的请求数不能超过最大允许请求数</span><br><span class="line">          //如果不足，那么可以从待请求队列中获取需要发起的请求</span><br><span class="line">          let newone = this.mq.shift();</span><br><span class="line">          //从映射对象中根据时间戳标识码获取实际的请求参数或者对象</span><br><span class="line">          let obj = this.map[newone];</span><br><span class="line">          let oldComplete = obj.complete;</span><br><span class="line">          obj.complete = (...args) =&gt; &#123;</span><br><span class="line">              //请求完成之后将请求其从正在发起的队列中移除</span><br><span class="line">              me.running.splice(me.running.indexOf(obj.t), 1);</span><br><span class="line">              //并且从map映射对象中移除</span><br><span class="line">              delete me.map[obj.t];</span><br><span class="line">              //这里是安全性检查，利用&amp;&amp;的短路原理，</span><br><span class="line">              //不太理解为什么还要再执行一次</span><br><span class="line">              oldComplete &amp;&amp; oldComplete.apply(obj, args);</span><br><span class="line">              //递归调用，相当于是轮询</span><br><span class="line">              me.next();</span><br><span class="line">          &#125;</span><br><span class="line">          //记录下该请求已经发起</span><br><span class="line">          this.running.push(obj.t);</span><br><span class="line">          //调用wx.request发起请求</span><br><span class="line">          return wx.request(obj);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    request (obj) &#123;</span><br><span class="line">        obj = obj || &#123;&#125;;</span><br><span class="line">        obj = (typeof(obj) === &apos;string&apos;) ? &#123;url: obj&#125; : obj;</span><br><span class="line">        this.push(obj);</span><br><span class="line">        return this.next();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>5.由于小程序将逻辑层和视图层完全分离，而他们通信的时候是通过wxJSBridge 实现的方式，每次setData的调用都是一次进程间的通信过程，因此花销较大。而wepy则对其进行了优化，将所有数据收集进行脏检查之后再调用setdata。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br></pre></td><td class="code"><pre><span class="line">$apply (fn) &#123;</span><br><span class="line">    <span class="comment">//如果传入函数作为参数，那么会先执行函数再进行脏检查</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">typeof</span>(fn) === <span class="string">'function'</span>) &#123;</span><br><span class="line">        fn.call(<span class="keyword">this</span>);</span><br><span class="line">        <span class="keyword">this</span>.$apply();</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">//如果流程中正在进行脏检查($$phase为digest)时等待，因为流程中同一时间只能有一次脏检查</span></span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.$$phase) &#123;</span><br><span class="line">            <span class="keyword">this</span>.$$phase = <span class="string">'$apply'</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">this</span>.$digest();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$digest () &#123;</span><br><span class="line">    <span class="keyword">let</span> k;</span><br><span class="line">    <span class="comment">//初始值，脏检查阶段进行比对</span></span><br><span class="line">    <span class="keyword">let</span> originData = <span class="keyword">this</span>.$data;</span><br><span class="line">    <span class="comment">//脏检查开始的标识</span></span><br><span class="line">    <span class="keyword">this</span>.$$phase = <span class="string">'$digest'</span>;</span><br><span class="line">    <span class="keyword">this</span>.$$dc = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span> (<span class="keyword">this</span>.$$phase) &#123;</span><br><span class="line">        <span class="keyword">this</span>.$$dc++;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.$$dc &gt;= <span class="number">3</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">'Can not call $apply in $apply process'</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//传入setData的参数</span></span><br><span class="line">        <span class="keyword">let</span> readyToSet = &#123;&#125;;</span><br><span class="line">        <span class="comment">//组件如果有computed属性，则先执行computed中的方法</span></span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.computed) &#123;</span><br><span class="line">            <span class="keyword">for</span> (k <span class="keyword">in</span> <span class="keyword">this</span>.computed) &#123; </span><br><span class="line">                <span class="keyword">let</span> fn = <span class="keyword">this</span>.computed[k], val = fn.call(<span class="keyword">this</span>);</span><br><span class="line">                <span class="keyword">if</span> (!util.$isEqual(<span class="keyword">this</span>[k], val)) &#123; </span><br><span class="line">                    readyToSet[<span class="keyword">this</span>.$prefix + k] = val;</span><br><span class="line">                    <span class="keyword">this</span>[k] = util.$copy(val, <span class="literal">true</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//比较data的初始值和现值，深度比较，不同则进行深拷贝</span></span><br><span class="line">        <span class="keyword">for</span> (k <span class="keyword">in</span> originData) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!util.$isEqual(<span class="keyword">this</span>[k], originData[k])) &#123;</span><br><span class="line">            <span class="comment">//如果有watcher，则执行watch属性中对应的观测数据函数，如果是字符串，则执行methods属性中对应的函数(参数为newValue，oldValue)</span></span><br><span class="line">                <span class="keyword">if</span> (<span class="keyword">this</span>.watch) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (<span class="keyword">this</span>.watch[k]) &#123;</span><br><span class="line">                        <span class="keyword">if</span> (<span class="keyword">typeof</span> <span class="keyword">this</span>.watch[k] === <span class="string">'function'</span>) &#123;</span><br><span class="line">                            <span class="keyword">this</span>.watch[k].call(<span class="keyword">this</span>, <span class="keyword">this</span>[k], originData[k]);</span><br><span class="line">                        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">typeof</span> <span class="keyword">this</span>.watch[k] === <span class="string">'string'</span> &amp;&amp; <span class="keyword">typeof</span> <span class="keyword">this</span>.methods[k] === <span class="string">'function'</span>) &#123;</span><br><span class="line">                            <span class="keyword">this</span>.methods[k].call(<span class="keyword">this</span>, <span class="keyword">this</span>[k], originData[k]);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                </span><br><span class="line">                <span class="comment">//将初始值和现值不一致的数据收集到对象中，稍后执行一次setdata</span></span><br><span class="line">                readyToSet[<span class="keyword">this</span>.$prefix + k] = <span class="keyword">this</span>[k];</span><br><span class="line">                <span class="keyword">this</span>.data[k] = <span class="keyword">this</span>[k];</span><br><span class="line">                <span class="comment">//深拷贝现值到初始值中，作为下一次脏检查的初始值</span></span><br><span class="line">                originData[k] = util.$copy(<span class="keyword">this</span>[k], <span class="literal">true</span>);</span><br><span class="line">                <span class="comment">//对repeat中的组件数据进行更新，repeat中不能watch有可能是这里的逻辑有冲突</span></span><br><span class="line">                <span class="keyword">if</span> (<span class="keyword">this</span>.$repeat &amp;&amp; <span class="keyword">this</span>.$repeat[k]) &#123;</span><br><span class="line">                    <span class="keyword">let</span> $repeat = <span class="keyword">this</span>.$repeat[k];</span><br><span class="line">                    <span class="keyword">this</span>.$com[$repeat.com].data[$repeat.props] = <span class="keyword">this</span>[k];</span><br><span class="line">                    <span class="keyword">this</span>.$com[$repeat.com].$setIndex(<span class="number">0</span>);</span><br><span class="line">                    <span class="keyword">this</span>.$com[$repeat.com].$apply();</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">//对props的值进行更新，实现父子传值的关键，以及双向绑定的关键</span></span><br><span class="line">                <span class="keyword">if</span> (<span class="keyword">this</span>.$mappingProps[k]) &#123;</span><br><span class="line">                    <span class="built_in">Object</span>.keys(<span class="keyword">this</span>.$mappingProps[k]).forEach(<span class="function">(<span class="params">changed</span>) =&gt;</span> &#123;</span><br><span class="line">                        <span class="keyword">let</span> mapping = <span class="keyword">this</span>.$mappingProps[k][changed];</span><br><span class="line">                        <span class="keyword">if</span> (<span class="keyword">typeof</span>(mapping) === <span class="string">'object'</span>) &#123;</span><br><span class="line">                            <span class="keyword">this</span>.$parent.$apply();</span><br><span class="line">                        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (changed === <span class="string">'parent'</span> &amp;&amp; !util.$isEqual(<span class="keyword">this</span>.$parent.$data[mapping], <span class="keyword">this</span>[k])) &#123;</span><br><span class="line">                            <span class="keyword">this</span>.$parent[mapping] = <span class="keyword">this</span>[k];</span><br><span class="line">                            <span class="keyword">this</span>.$parent.data[mapping] = <span class="keyword">this</span>[k];</span><br><span class="line">                            <span class="keyword">this</span>.$parent.$apply();</span><br><span class="line">                        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (changed !== <span class="string">'parent'</span> &amp;&amp; !util.$isEqual(<span class="keyword">this</span>.$com[changed].$data[mapping], <span class="keyword">this</span>[k])) &#123;</span><br><span class="line">                            <span class="keyword">this</span>.$com[changed][mapping] = <span class="keyword">this</span>[k];</span><br><span class="line">                            <span class="keyword">this</span>.$com[changed].data[mapping] = <span class="keyword">this</span>[k];</span><br><span class="line">                            <span class="keyword">this</span>.$com[changed].$apply();</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//对readyToSet对象收集到的变化数据进行一次setData</span></span><br><span class="line">        <span class="comment">//$$nextTick为视图渲染完成后，执行的回调，可以是promise，也可以是普通函数，如果在调用this.$nextTick中不传参数，则必为promise</span></span><br><span class="line">        <span class="comment">//我们可以利用this.$nextTick进行一些操作</span></span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">Object</span>.keys(readyToSet).length) &#123;</span><br><span class="line">            <span class="keyword">this</span>.setData(readyToSet, () =&gt; &#123;</span><br><span class="line">                <span class="keyword">if</span> (<span class="keyword">this</span>.$$nextTick) &#123;</span><br><span class="line">                    <span class="keyword">let</span> $$nextTick = <span class="keyword">this</span>.$$nextTick;</span><br><span class="line">                    <span class="keyword">this</span>.$$nextTick = <span class="literal">null</span>;</span><br><span class="line">                    <span class="keyword">if</span> ($$nextTick.promise) &#123;</span><br><span class="line">                        $$nextTick();</span><br><span class="line">                    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                        $$nextTick.call(<span class="keyword">this</span>);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">this</span>.$$nextTick) &#123;</span><br><span class="line">                <span class="keyword">let</span> $$nextTick = <span class="keyword">this</span>.$$nextTick;</span><br><span class="line">                <span class="keyword">this</span>.$$nextTick = <span class="literal">null</span>;</span><br><span class="line">                <span class="keyword">if</span> ($$nextTick.promise) &#123;</span><br><span class="line">                    $$nextTick();</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    $$nextTick.call(<span class="keyword">this</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">this</span>.$$phase = (<span class="keyword">this</span>.$$phase === <span class="string">'$apply'</span>) ? <span class="string">'$digest'</span> : <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$nextTick (fn) &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">typeof</span> fn === <span class="string">'undefined'</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">                <span class="keyword">this</span>.$$nextTick = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">                    resolve();</span><br><span class="line">                &#125;;</span><br><span class="line">                <span class="keyword">this</span>.$$nextTick.promise = <span class="literal">true</span>;</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">this</span>.$$nextTick = fn;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>脏检查机制在Angular中使用，数据量大的时候具有优势，而Vue和React用的是依赖收集的方式，这需要在每次更新数据之后重新进行依赖收集，在数据量大的时候频繁的收集依赖就不如脏检查高效了。</p>
+<ul>
+<li>6.通过给不同组件的变量属性加上$prefix组件名作为前缀，为组件提供了一个”作用域”，而这个前缀是components中的key值，因此如果多个同名组件设置相同的key值，就会共享同一个实例。</li>
+<li>7.wepy提供了slot插槽的功能，这为提高组件的可复用性提供了帮助。可以将通用的组件高度抽象，像vue可以利用scope-slot进行封装<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;toggle&gt;</span><br><span class="line">  it<span class="string">'s a slot.</span></span><br><span class="line"><span class="string">&lt;/toggle&gt;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">//toggle.wpy</span></span><br><span class="line"><span class="string">&lt;template&gt;</span></span><br><span class="line"><span class="string"> &lt;div&gt;</span></span><br><span class="line"><span class="string">   &lt;slot /&gt;</span></span><br><span class="line"><span class="string"> &lt;/div&gt;</span></span><br><span class="line"><span class="string">&lt;/temlate&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="五、总结"><a href="#五、总结" class="headerlink" title="五、总结"></a>五、总结</h4><p>wepy比起原生小程序，对于开发过程更便捷了，在编译过程中生成了rst对象，抽象出各个组件间的信息，也支持了npm包以及解决了并发限制的问题，在解决npm包上用了拷贝的方式，以及用消息队列的方式对请求数进行控制。利用脏检查机制，找出改变的数据，然后再一次过进行setData也解决了多次setData带来的性能损耗，不过还是难以解决视图层和逻辑层进程间通信制约了数据传输不能过大的问题。以组件树这种数据结构对page和组件的关系进行构建，便于进行父子间组件通信的实现，而通过以组件命名作为前缀的变量和属性命名，让组件之间的变量有了”作用域”。针对wepy中不足的地方，我也正在思考如何解决，希望能为wepy贡献一份力。<br>此外wepy利用了getter对事件进行劫持，实现了拦截器的效果，以及mixins复用，提供了可以作为基类组件的用法，这些都是wepy的优点，</p>
+<h4 id="未完待续。。。。"><a href="#未完待续。。。。" class="headerlink" title="未完待续。。。。"></a>未完待续。。。。</h4>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/post-2/" rel="prev" title="异步回调的解决方案">
+                异步回调的解决方案 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">charliemei</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                友情链接
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://kalasearch.cn" title="卡拉搜索" target="_blank">卡拉搜索</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#一、wepy是什么"><span class="nav-number">1.</span> <span class="nav-text">一、wepy是什么</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#二、wepy解决了什么问题"><span class="nav-number">2.</span> <span class="nav-text">二、wepy解决了什么问题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#三、wepy不足之处"><span class="nav-number">3.</span> <span class="nav-text">三、wepy不足之处</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#四、解决方案"><span class="nav-number">4.</span> <span class="nav-text">四、解决方案</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#五、总结"><span class="nav-number">5.</span> <span class="nav-text">五、总结</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#未完待续。。。。"><span class="nav-number">6.</span> <span class="nav-text">未完待续。。。。</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">charliemei</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="一、什么是 Generator The Generator object is returned by a generator function and it conforms to both the iterable protocol and the iterator protocol. 生成器对象是由一个 generator function 返回的,并且它符合可迭代协议和迭代器协议。  可迭">
+<meta property="og:type" content="article">
+<meta property="og:title" content="说说 Generator">
+<meta property="og:url" content="https://github.com/meijintao233/meijintao233.github.io/post-15/index.html">
+<meta property="og:site_name" content="charliemei">
+<meta property="og:description" content="一、什么是 Generator The Generator object is returned by a generator function and it conforms to both the iterable protocol and the iterator protocol. 生成器对象是由一个 generator function 返回的,并且它符合可迭代协议和迭代器协议。  可迭">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-07-24T11:23:07.499Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="说说 Generator">
+<meta name="twitter:description" content="一、什么是 Generator The Generator object is returned by a generator function and it conforms to both the iterable protocol and the iterator protocol. 生成器对象是由一个 generator function 返回的,并且它符合可迭代协议和迭代器协议。  可迭">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://github.com/meijintao233/meijintao233.github.io/post-15/">
+
+
+
+
+
+  <title>说说 Generator | charliemei</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">charliemei</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            links
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/meijintao233/meijintao233.github.io/post-15/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="charliemei">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="charliemei">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">说说 Generator</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-03-08T15:52:55+08:00">
+                2020-03-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="一、什么是-Generator"><a href="#一、什么是-Generator" class="headerlink" title="一、什么是 Generator"></a>一、什么是 Generator</h2><blockquote>
+<p>The <strong>Generator</strong> object is returned by a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*" target="_blank" rel="noopener">generator function</a> and it conforms to both the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols#The_iterable_protocol" target="_blank" rel="noopener">iterable protocol</a> and the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols#The_iterator_protocol" target="_blank" rel="noopener">iterator protocol</a>.</p>
+<p><strong>生成器</strong>对象是由一个 <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/function*" target="_blank" rel="noopener">generator function</a> 返回的,并且它符合<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Iteration_protocols#iterable" target="_blank" rel="noopener">可迭代协议</a>和<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Iteration_protocols#iterator" target="_blank" rel="noopener">迭代器协议</a>。</p>
+</blockquote>
+<h3 id="可迭代协议"><a href="#可迭代协议" class="headerlink" title="可迭代协议"></a>可迭代协议</h3><p><strong>可迭代协议</strong>是指允许 JavaScript 对象（可迭代对象）去定义或定制它们的迭代行为，这个对象（或其原型链中的任意一个对象）必须具有一个带 <code>Symbol.iterator</code>键的属性，其值返回一个对象的无参函数，被返回对象符合<strong>迭代器协议</strong></p>
+<h3 id="迭代器协议"><a href="#迭代器协议" class="headerlink" title="迭代器协议"></a>迭代器协议</h3><p><strong>迭代器协议</strong>定义了一种标准的方式来产生一个有限或无限序列的值，并且当所有的值都已经被迭代后，就会有一个默认的返回值</p>
+<p><strong>迭代器</strong>需要实现 <strong>next() </strong>方法，返回一个对象的无参函数，被返回对象拥有两个属性，分别是 (done :Boolean) 迭代器已经超过了可迭代次数时为 true，这时 value 的值可以被省略，除非该迭代器 return 了某个值</p>
+<a id="more"></a>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> iterable = &#123;</span><br><span class="line">  *[<span class="built_in">Symbol</span>.iterator](n) &#123;</span><br><span class="line">    <span class="keyword">yield</span> <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">yield</span> (n || <span class="number">0</span>) + <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">yield</span> <span class="number">3</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> value <span class="keyword">of</span> iterable) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(value); <span class="comment">// 1 2 3</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(...iterable[<span class="built_in">Symbol</span>.iterator](<span class="number">4</span>)); <span class="comment">// 1 6 3</span></span><br><span class="line"><span class="built_in">console</span>.log(iterable[<span class="built_in">Symbol</span>.iterator](<span class="number">4</span>).next());</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">Object &#123;</span></span><br><span class="line"><span class="comment">  done: false,</span></span><br><span class="line"><span class="comment">  value: 1</span></span><br><span class="line"><span class="comment">&#125;</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<h3 id="生成器函数"><a href="#生成器函数" class="headerlink" title="生成器函数"></a>生成器函数</h3><p>生成器函数的定义和普通函数类似，只是需要在函数名前关键字 <strong>function </strong>后添加 <strong>*</strong> 号 <strong>funtion* generator(){}</strong>，需要注意的是，生成器函数<strong>不能</strong>作为构造函数</p>
+<p>调用生成器函数后会返回一个生成器对象，该对象是个可迭代对象，同时实现了 <strong>next</strong> 方法，所以也是一个迭代器，即生成器既是迭代器也是可迭代对象</p>
+<p><strong>yield</strong> 表达式就是用来表示迭代暂停的位置</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span>* <span class="title">demo</span>(<span class="params">d</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">yield</span> <span class="number">10</span>;</span><br><span class="line">  x = <span class="keyword">yield</span> d;</span><br><span class="line">  <span class="keyword">yield</span> x;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> gen = demo(<span class="number">666</span>);</span><br><span class="line">gen.next(); <span class="comment">// 10</span></span><br><span class="line">gen.next(); <span class="comment">// 666</span></span><br><span class="line">gen.next(); <span class="comment">// undefined</span></span><br><span class="line">gen.next(); <span class="comment">// undefined</span></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">Object &#123;</span></span><br><span class="line"><span class="comment">  done: false,</span></span><br><span class="line"><span class="comment">  value: 10</span></span><br><span class="line"><span class="comment">&#125;</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">Object &#123;</span></span><br><span class="line"><span class="comment">  done: false,</span></span><br><span class="line"><span class="comment">  value: 666</span></span><br><span class="line"><span class="comment">&#125;</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">Object &#123;</span></span><br><span class="line"><span class="comment">  done: false,</span></span><br><span class="line"><span class="comment">  value: undefined</span></span><br><span class="line"><span class="comment">&#125;</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">Object &#123;</span></span><br><span class="line"><span class="comment">  done: true,</span></span><br><span class="line"><span class="comment">  value: undefined</span></span><br><span class="line"><span class="comment">&#125;</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 以下省略next（）返回对象，只表 value 值</span></span><br><span class="line"><span class="keyword">const</span> gen = demo(<span class="number">666</span>);</span><br><span class="line">gen.next(); <span class="comment">// 10</span></span><br><span class="line">gen.next(<span class="number">55</span>); <span class="comment">// 666</span></span><br><span class="line">gen.next(); <span class="comment">// 55</span></span><br><span class="line">gen.next(); <span class="comment">// undefined</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span>* <span class="title">demo1</span>(<span class="params">d</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">yield</span> <span class="number">10</span>;</span><br><span class="line">  &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(e); <span class="comment">// 55</span></span><br><span class="line">    x = <span class="keyword">yield</span> d;</span><br><span class="line">    <span class="keyword">yield</span> x;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">const</span> gen = demo1(<span class="number">666</span>);</span><br><span class="line">gen.next(); <span class="comment">// 10 false</span></span><br><span class="line">gen.return(<span class="number">55</span>); <span class="comment">// 55 true</span></span><br><span class="line">gen.next(); <span class="comment">// undefined true</span></span><br><span class="line">gen.next(); <span class="comment">// undefined true</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> gen = demo1(<span class="number">666</span>);</span><br><span class="line">gen.next(); <span class="comment">// 10 false</span></span><br><span class="line">gen.throw(<span class="number">55</span>); <span class="comment">// 666 true</span></span><br><span class="line">gen.next(); <span class="comment">// undefined true</span></span><br><span class="line">gen.next(); <span class="comment">// undefined true</span></span><br></pre></td></tr></table></figure>
+<p>从上面的例子我们能看出来，执行 <strong>next</strong>() 的时候，代码的运行会到 yield 关键字的右侧，这时返回的值就是 <strong>yield</strong> 右侧的语句执行的结果，而 <strong>next()</strong> 中的传参则会被赋值到 <strong>yield</strong> 左侧，即作为 <strong>yield</strong> 的返回值使用。</p>
+<p>如果生成器对象调用 <strong>throw</strong> 方法，那么能够被 tryCatch 捕获到，并且在 catch 的 body 中可以继续执行</p>
+<p>如果生成器对象调用 <strong>return</strong> 方法，那么函数立即返回，同时后续的 <strong>yield</strong>都不会被执行，等同于函数在该语句的位置被 return 了</p>
+<h3 id="yield-和-yield"><a href="#yield-和-yield" class="headerlink" title="yield 和 yield*"></a>yield 和 yield*</h3><p><strong>yield*</strong> 表达式用于委托给另一个可迭代对象</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span>* <span class="title">g1</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">yield</span> <span class="number">2</span>;</span><br><span class="line">  <span class="keyword">yield</span> <span class="number">3</span>;</span><br><span class="line">  <span class="keyword">yield</span> <span class="number">4</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span>* <span class="title">g2</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">yield</span> <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 嵌套生成器</span></span><br><span class="line">  <span class="keyword">yield</span>* g1();</span><br><span class="line">  <span class="keyword">yield</span> g1();</span><br><span class="line"></span><br><span class="line">  <span class="keyword">yield</span>* [<span class="number">5</span>, <span class="keyword">yield</span> <span class="string">"hi4"</span>, <span class="number">6</span>, <span class="keyword">yield</span>* <span class="string">"hi"</span>]; <span class="comment">// [5,undefined,6,undefined] 第一个是因为next()没有参数导致的，第二个是因为 yield* 没有 return 结果</span></span><br><span class="line">  <span class="keyword">yield</span> [<span class="number">7</span>, <span class="number">8</span>];</span><br><span class="line"></span><br><span class="line">  <span class="keyword">yield</span> <span class="number">9</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> iterator = g2();</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(iterator.next()); <span class="comment">// &#123; value: 1, done: false &#125;</span></span><br><span class="line"><span class="built_in">console</span>.log(iterator.next()); <span class="comment">// &#123; value: 2, done: false &#125;</span></span><br><span class="line"><span class="built_in">console</span>.log(iterator.next()); <span class="comment">// &#123; value: 3, done: false &#125;</span></span><br><span class="line"><span class="built_in">console</span>.log(iterator.next()); <span class="comment">// &#123; value: 4, done: false &#125;</span></span><br><span class="line"><span class="built_in">console</span>.log(iterator.next()); <span class="comment">// &#123; value: [object Generator] &#123;&#125;, done: false &#125;</span></span><br><span class="line"><span class="built_in">console</span>.log(iterator.next()); <span class="comment">// &#123; value: 'hi4', done: false &#125;</span></span><br><span class="line"><span class="built_in">console</span>.log(iterator.next()); <span class="comment">// &#123; value: 'h', done: false &#125;</span></span><br><span class="line"><span class="built_in">console</span>.log(iterator.next()); <span class="comment">// &#123; value: 'i', done: false &#125;</span></span><br><span class="line"><span class="built_in">console</span>.log(iterator.next()); <span class="comment">// &#123; value: '5', done: false &#125;</span></span><br><span class="line"><span class="built_in">console</span>.log(iterator.next()); <span class="comment">// &#123; value: undefined, done: false &#125;</span></span><br><span class="line"><span class="built_in">console</span>.log(iterator.next()); <span class="comment">// &#123; value: '6', done: false &#125;</span></span><br><span class="line"><span class="built_in">console</span>.log(iterator.next()); <span class="comment">// &#123; value: undefined, done: false &#125;</span></span><br><span class="line"><span class="built_in">console</span>.log(iterator.next()); <span class="comment">// &#123; value: [7,8], done: false &#125;</span></span><br><span class="line"><span class="built_in">console</span>.log(iterator.next()); <span class="comment">// &#123; value: 9, done: false &#125;</span></span><br><span class="line"><span class="built_in">console</span>.log(iterator.next()); <span class="comment">// &#123; value: undefined, done: true &#125;</span></span><br></pre></td></tr></table></figure>
+<p>从上面的例子可以看出，<strong>yield*</strong> 的作用实质上是解决嵌套可迭代对象（arguments，array，string，set，map 等都是可迭代的）的问题，更像是个语法糖，同时其 <strong>yield</strong> 还有一个区别是它是表达式，所以会有自己的返回值，而 <strong>yield </strong>的返回值由 <strong>next()</strong> 参数所决定。</p>
+<h2 id="二、意义（解决什么问题）"><a href="#二、意义（解决什么问题）" class="headerlink" title="二、意义（解决什么问题）"></a>二、意义（解决什么问题）</h2><h3 id="协程与化异步为同步写法"><a href="#协程与化异步为同步写法" class="headerlink" title="协程与化异步为同步写法"></a>协程与化异步为同步写法</h3><p>与协程相关的是进程、线程，进程是计算机资源分配的基本单位，线程是执行的基本单位。</p>
+<p>计算机将存储资源分配给进程之后，进程就可以利用这些资源进行计算，进程可以生成线程去执行语句，线程间可以使用共享内存进行通讯，而协程则是更精细化的资源管理。为了防止某一进程占用过多资源，Cpu 有一套调度算法，随着粒度越细，切换的时候的消耗就越小，协程则可以理解成是在某个线程中的多线程而这个切换过程是无需系统参与的，也就少了系统调用，同时也是在同一个栈上切换的，例如 Go 的 coroutine 就是占用更少的资源，进行更精细的调度。</p>
+<p>generator 的暂停执行特性，可以将函数执行的控制权交出，JS 的单线程特性使得可以利用 generator 实现协程，其中的关键在于实现流程自动调度功能。</p>
+<p>JS 是运行在单线程中的，为了提高效率，引入了异步方式，当运行一些远程 IO 或者网络请求的时候可以无需等待直接往下执行，等拿到响应之后再执行回调。这就引入了一个典型的问题，就是回调嵌套地狱(callback hell)。</p>
+<p>当引入了 <strong>generator</strong> 后，异步的代码就可以写成同步的方式，降低认知成本，提高代码可读性</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">doAsync1(str, res1 =&gt; &#123;</span><br><span class="line">  doAsync2(res1, res2 =&gt; &#123;</span><br><span class="line">    doAsync3(res2, res3 =&gt; &#123;&#125;);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span>* <span class="title">doAsync</span>(<span class="params">str</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> res1 = <span class="keyword">yield</span> doAsync1(str);</span><br><span class="line">  <span class="keyword">const</span> res2 = <span class="keyword">yield</span> doAsync2(res1);</span><br><span class="line">  <span class="keyword">const</span> res3 = <span class="keyword">yield</span> doAsync3(res2);</span><br><span class="line">  <span class="built_in">console</span>.log(res3);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> gen = doAsync(str);</span><br><span class="line"><span class="keyword">const</span> async1 = gen.next().value;</span><br><span class="line"><span class="keyword">const</span> async2 = gen.next(async1).value;</span><br><span class="line"><span class="keyword">const</span> async3 = gen.next(async2).value;</span><br></pre></td></tr></table></figure>
+<h2 id="三、实践和库（-co-和-redux-saga）"><a href="#三、实践和库（-co-和-redux-saga）" class="headerlink" title="三、实践和库（ co 和 redux-saga）"></a>三、实践和库（ co 和 redux-saga）</h2><p>co 和 redux-saga 的核心代码是类似的，都实现了一套流程自动调度，redux-saga 在此基础上添加了更多的功能</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> it = gen();</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">next</span>(<span class="params">res</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (!it.done) &#123;</span><br><span class="line">    <span class="keyword">const</span> ret = it.next(res);</span><br><span class="line">    next(ret.value);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">next();</span><br></pre></td></tr></table></figure>
+<h3 id="co"><a href="#co" class="headerlink" title="co"></a>co</h3><p><strong>co </strong>库主要做的一件事情就是为 generator 包裹一层 promise，然后通过 then 将控制权返回，同时对于 generator 实现了流程的自动调度，对于对象和数组类型还支持并发调用。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 将对象的value值转化为promise数组 在用Promise.all实现并发</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">objectToPromise</span>(<span class="params">obj</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> results = <span class="keyword">new</span> obj.constructor();</span><br><span class="line">  <span class="keyword">var</span> keys = <span class="built_in">Object</span>.keys(obj);</span><br><span class="line">  <span class="keyword">var</span> promises = [];</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; keys.length; i++) &#123;</span><br><span class="line">    <span class="keyword">var</span> key = keys[i];</span><br><span class="line">    <span class="comment">// 将非promise类型转为promise</span></span><br><span class="line">    <span class="keyword">var</span> promise = toPromise.call(<span class="keyword">this</span>, obj[key]);</span><br><span class="line">    <span class="keyword">if</span> (promise &amp;&amp; isPromise(promise)) defer(promise, key);</span><br><span class="line">    <span class="keyword">else</span> results[key] = obj[key];</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 并发调用</span></span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">Promise</span>.all(promises).then(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> results;</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">defer</span>(<span class="params">promise, key</span>) </span>&#123;</span><br><span class="line">    results[key] = <span class="literal">undefined</span>;</span><br><span class="line">    <span class="comment">// 返回值以对象形式返回</span></span><br><span class="line">    promises.push(</span><br><span class="line">      promise.then(<span class="function"><span class="keyword">function</span>(<span class="params">res</span>) </span>&#123;</span><br><span class="line">        results[key] = res;</span><br><span class="line">      &#125;)</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 将数组中的非promise类型元素转为promise</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">arrayToPromise</span>(<span class="params">obj</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">Promise</span>.all(obj.map(toPromise, <span class="keyword">this</span>));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 主体部分非常简洁</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">co</span>(<span class="params">gen</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> ctx = <span class="keyword">this</span>;</span><br><span class="line">  <span class="keyword">var</span> args = slice.call(<span class="built_in">arguments</span>, <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span>(<span class="params">resolve, reject</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">typeof</span> gen === <span class="string">"function"</span>) gen = gen.apply(ctx, args);</span><br><span class="line">    <span class="keyword">if</span> (!gen || <span class="keyword">typeof</span> gen.next !== <span class="string">"function"</span>) <span class="keyword">return</span> resolve(gen);</span><br><span class="line"></span><br><span class="line">    onFulfilled();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">onFulfilled</span>(<span class="params">res</span>) </span>&#123;</span><br><span class="line">      <span class="keyword">var</span> ret;</span><br><span class="line">      <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// 执行相邻 yield 之间语句, res 为上一个 yield 左侧值，即yield右侧语句执行后返回值</span></span><br><span class="line">        ret = gen.next(res);</span><br><span class="line">      &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">        <span class="comment">// 捕获异常抛出错误</span></span><br><span class="line">        <span class="keyword">return</span> reject(e);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="comment">//递归调用，将 yield 右侧的值赋值给 yield 的左侧</span></span><br><span class="line">      next(ret);</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">onRejected</span>(<span class="params">err</span>) </span>&#123;</span><br><span class="line">      <span class="keyword">var</span> ret;</span><br><span class="line">      <span class="keyword">try</span> &#123;</span><br><span class="line">        ret = gen.throw(err);</span><br><span class="line">      &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">        <span class="keyword">return</span> reject(e);</span><br><span class="line">      &#125;</span><br><span class="line">      next(ret);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">next</span>(<span class="params">ret</span>) </span>&#123;</span><br><span class="line">      <span class="comment">// 递归结束后 将return值 返回</span></span><br><span class="line">      <span class="keyword">if</span> (ret.done) <span class="keyword">return</span> resolve(ret.value);</span><br><span class="line">      <span class="keyword">var</span> value = toPromise.call(ctx, ret.value);</span><br><span class="line">      <span class="keyword">if</span> (value &amp;&amp; isPromise(value))</span><br><span class="line">        <span class="comment">// 递归调用promise</span></span><br><span class="line">        <span class="keyword">return</span> value.then(onFulfilled, onRejected);</span><br><span class="line">      <span class="keyword">return</span> onRejected(</span><br><span class="line">        <span class="keyword">new</span> <span class="built_in">TypeError</span>(</span><br><span class="line">          <span class="string">"You may only yield a function, promise, generator, array, or object, "</span> +</span><br><span class="line">            <span class="string">'but the following object was passed: "'</span> +</span><br><span class="line">            <span class="built_in">String</span>(ret.value) +</span><br><span class="line">            <span class="string">'"'</span></span><br><span class="line">        )</span><br><span class="line">      );</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="redux-saga"><a href="#redux-saga" class="headerlink" title="redux-saga"></a>redux-saga</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> createSagaMiddleware <span class="keyword">from</span> <span class="string">"redux-saga"</span>;</span><br><span class="line"><span class="keyword">import</span> rootSaga <span class="keyword">from</span> <span class="string">"./sagas"</span>;</span><br><span class="line"><span class="keyword">const</span> sagaMiddleware = createSagaMiddleware();</span><br><span class="line">sagaMiddleware.run(rootSaga);</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// redux-saga/packages/core/src/internal/middleware.js</span></span><br><span class="line"><span class="comment">// createSagaMiddleware 执行的就是这个函数</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="function"><span class="keyword">function</span> <span class="title">sagaMiddlewareFactory</span>(<span class="params">&#123;</span></span></span><br><span class="line"><span class="function"><span class="params">  context = &#123;&#125;,</span></span></span><br><span class="line"><span class="function"><span class="params">  channel = stdChannel(</span>),</span></span><br><span class="line"><span class="function">  <span class="title">sagaMonitor</span>,</span></span><br><span class="line"><span class="function">  ...<span class="title">options</span></span></span><br><span class="line"><span class="function">&#125; = </span>&#123;&#125;) &#123;</span><br><span class="line">  <span class="keyword">let</span> boundRunSaga;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">sagaMiddleware</span>(<span class="params">&#123; getState, dispatch &#125;</span>) </span>&#123;</span><br><span class="line">    boundRunSaga = runSaga.bind(<span class="literal">null</span>, &#123;</span><br><span class="line">      ...options,</span><br><span class="line">      context,</span><br><span class="line">      channel,</span><br><span class="line">      dispatch,</span><br><span class="line">      getState,</span><br><span class="line">      sagaMonitor</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="params">next</span> =&gt;</span> action =&gt; &#123;</span><br><span class="line">      <span class="keyword">if</span> (sagaMonitor &amp;&amp; sagaMonitor.actionDispatched) &#123;</span><br><span class="line">        sagaMonitor.actionDispatched(action);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">const</span> result = next(action);</span><br><span class="line">      channel.put(action);</span><br><span class="line">      <span class="keyword">return</span> result;</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 这里会传入rootSaga，即项目中的所有的saga effect，也就是 generator</span></span><br><span class="line">  sagaMiddleware.run = <span class="function">(<span class="params">...args</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> boundRunSaga(...args);</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">  <span class="keyword">return</span> sagaMiddleware;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//redux-saga/packages/core/src/internal/runSaga.js</span></span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">runSaga</span>(<span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">  &#123;</span></span></span><br><span class="line"><span class="function"><span class="params">    channel = stdChannel(</span>),</span></span><br><span class="line"><span class="function">    <span class="title">dispatch</span>,</span></span><br><span class="line"><span class="function">    <span class="title">getState</span>,</span></span><br><span class="line"><span class="function">    <span class="title">context</span> = </span>&#123;&#125;,</span><br><span class="line">    sagaMonitor,</span><br><span class="line">    effectMiddlewares,</span><br><span class="line">    onError = logError</span><br><span class="line">  &#125;,</span><br><span class="line">  saga,</span><br><span class="line">  ...args</span><br><span class="line">) &#123;</span><br><span class="line">  <span class="comment">// 这里的 saga 即是上面的 rootSaga，iterator 为生成器对象</span></span><br><span class="line">  <span class="keyword">const</span> iterator = saga(...args);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> effectId = nextSagaId();</span><br><span class="line"></span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> immediately(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> task = proc(</span><br><span class="line">      env,</span><br><span class="line">      iterator,</span><br><span class="line">      context,</span><br><span class="line">      effectId,</span><br><span class="line">      getMetaInfo(saga),</span><br><span class="line">      <span class="comment">/* isRoot */</span> <span class="literal">true</span>,</span><br><span class="line">      <span class="literal">undefined</span></span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (sagaMonitor) &#123;</span><br><span class="line">      sagaMonitor.effectResolved(effectId, task);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> task;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//redux-saga/packages/core/src/internal/proc.js</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="function"><span class="keyword">function</span> <span class="title">proc</span>(<span class="params">env, iterator, parentContext, parentEffectId, meta, isRoot, cont</span>) </span>&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line"></span><br><span class="line">  next.cancel = noop</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> mainTask = &#123; meta, <span class="attr">cancel</span>: cancelMain, <span class="attr">status</span>: RUNNING &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> task = newTask(env, mainTask, parentContext, parentEffectId, meta, isRoot, cont)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> executingContext = &#123;</span><br><span class="line">    task,</span><br><span class="line">    digestEffect,</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">cancelMain</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (mainTask.status === RUNNING) &#123;</span><br><span class="line">      mainTask.status = CANCELLED</span><br><span class="line">      next(TASK_CANCEL)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (cont) &#123;</span><br><span class="line">    cont.cancel = task.cancel</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  next()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> task</span><br><span class="line">  <span class="comment">// 递归 iterator 生成器对象</span></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">next</span>(<span class="params">arg, isErr</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="keyword">let</span> result</span><br><span class="line">      <span class="keyword">if</span> (isErr) &#123;</span><br><span class="line">        <span class="comment">// 抛错误</span></span><br><span class="line">        result = iterator.throw(arg)</span><br><span class="line"></span><br><span class="line">        sagaError.clear()</span><br><span class="line">      &#125; <span class="keyword">else</span> <span class="keyword">if</span> (shouldCancel(arg)) &#123;</span><br><span class="line"></span><br><span class="line">        mainTask.status = CANCELLED</span><br><span class="line">        <span class="comment">// 取消并返回迭代器对象</span></span><br><span class="line">        next.cancel()</span><br><span class="line"></span><br><span class="line">        result = is.func(iterator.return) ? iterator.return(TASK_CANCEL) : &#123; <span class="attr">done</span>: <span class="literal">true</span>, <span class="attr">value</span>: TASK_CANCEL &#125;</span><br><span class="line">      &#125; <span class="keyword">else</span> <span class="keyword">if</span> (shouldTerminate(arg)) &#123;</span><br><span class="line">       <span class="comment">// 中断并返回迭代器对象</span></span><br><span class="line">        result = is.func(iterator.return) ? iterator.return() : &#123; <span class="attr">done</span>: <span class="literal">true</span> &#125;</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        result = iterator.next(arg)</span><br><span class="line">      &#125;</span><br><span class="line">			<span class="comment">// 如果迭代未结束则继续递归，并将返回值注入</span></span><br><span class="line">      <span class="keyword">if</span> (!result.done) &#123;</span><br><span class="line">        digestEffect(result.value, parentEffectId, next)</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="comment">// ...</span></span><br><span class="line">    &#125; <span class="keyword">catch</span> (error) &#123;</span><br><span class="line">      <span class="keyword">if</span> (mainTask.status === CANCELLED) &#123;</span><br><span class="line">        <span class="keyword">throw</span> error</span><br><span class="line">      &#125;</span><br><span class="line">      mainTask.status = ABORTED</span><br><span class="line"></span><br><span class="line">      mainTask.cont(error, <span class="literal">true</span>)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// 递归调用 next，cb 即为传入的 next函数，effect 为返回值</span></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">digestEffect</span>(<span class="params">effect, parentEffectId, cb, label = <span class="string">''</span></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">const</span> effectId = nextEffectId()</span><br><span class="line"></span><br><span class="line">		<span class="comment">//...</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">let</span> effectSettled</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">currCb</span>(<span class="params">res, isErr</span>) </span>&#123;</span><br><span class="line">      <span class="keyword">if</span> (effectSettled) &#123;</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      effectSettled = <span class="literal">true</span></span><br><span class="line">      cb.cancel = noop</span><br><span class="line">      <span class="comment">//...</span></span><br><span class="line"></span><br><span class="line">      <span class="comment">// 继续递归</span></span><br><span class="line">      cb(res, isErr)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">	   <span class="comment">//...</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/post-14/" rel="next" title="一次 webpack 分享小记">
+                <i class="fa fa-chevron-left"></i> 一次 webpack 分享小记
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/post-16/" rel="prev" title="node.js 启动流程解析">
+                node.js 启动流程解析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">charliemei</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                友情链接
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://kalasearch.cn" title="卡拉搜索" target="_blank">卡拉搜索</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、什么是-Generator"><span class="nav-number">1.</span> <span class="nav-text">一、什么是 Generator</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#可迭代协议"><span class="nav-number">1.1.</span> <span class="nav-text">可迭代协议</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#迭代器协议"><span class="nav-number">1.2.</span> <span class="nav-text">迭代器协议</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#生成器函数"><span class="nav-number">1.3.</span> <span class="nav-text">生成器函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#yield-和-yield"><span class="nav-number">1.4.</span> <span class="nav-text">yield 和 yield*</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、意义（解决什么问题）"><span class="nav-number">2.</span> <span class="nav-text">二、意义（解决什么问题）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#协程与化异步为同步写法"><span class="nav-number">2.1.</span> <span class="nav-text">协程与化异步为同步写法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、实践和库（-co-和-redux-saga）"><span class="nav-number">3.</span> <span class="nav-text">三、实践和库（ co 和 redux-saga）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#co"><span class="nav-number">3.1.</span> <span class="nav-text">co</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#redux-saga"><span class="nav-number">3.2.</span> <span class="nav-text">redux-saga</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">charliemei</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

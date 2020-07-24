@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="发现问题在实践过程中经常会遇到a，b，c，d…等函数，后者依赖于前者请求之后的结果，或者是d依赖于a，b，c…等函数这些情形，在第一种情况中会出现回调嵌套的情形1234567a()&amp;#123;	b()&amp;#123;		c()&amp;#123;			...		&amp;#125;	&amp;#125;&amp;#125; 而第二种情况中，为了能更快获取到a，b，c…等的回调内容，会考虑进行并发请求，而这些又该如何解决呢？请继续往下">
+<meta property="og:type" content="article">
+<meta property="og:title" content="异步回调的解决方案">
+<meta property="og:url" content="https://github.com/meijintao233/meijintao233.github.io/post-2/index.html">
+<meta property="og:site_name" content="charliemei">
+<meta property="og:description" content="发现问题在实践过程中经常会遇到a，b，c，d…等函数，后者依赖于前者请求之后的结果，或者是d依赖于a，b，c…等函数这些情形，在第一种情况中会出现回调嵌套的情形1234567a()&amp;#123;	b()&amp;#123;		c()&amp;#123;			...		&amp;#125;	&amp;#125;&amp;#125; 而第二种情况中，为了能更快获取到a，b，c…等的回调内容，会考虑进行并发请求，而这些又该如何解决呢？请继续往下">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-07-24T11:23:07.682Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="异步回调的解决方案">
+<meta name="twitter:description" content="发现问题在实践过程中经常会遇到a，b，c，d…等函数，后者依赖于前者请求之后的结果，或者是d依赖于a，b，c…等函数这些情形，在第一种情况中会出现回调嵌套的情形1234567a()&amp;#123;	b()&amp;#123;		c()&amp;#123;			...		&amp;#125;	&amp;#125;&amp;#125; 而第二种情况中，为了能更快获取到a，b，c…等的回调内容，会考虑进行并发请求，而这些又该如何解决呢？请继续往下">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://github.com/meijintao233/meijintao233.github.io/post-2/">
+
+
+
+
+
+  <title>异步回调的解决方案 | charliemei</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">charliemei</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            links
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/meijintao233/meijintao233.github.io/post-2/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="charliemei">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="charliemei">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">异步回调的解决方案</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-06T12:58:26+08:00">
+                2018-08-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="发现问题"><a href="#发现问题" class="headerlink" title="发现问题"></a>发现问题</h4><p>在实践过程中经常会遇到a，b，c，d…等函数，后者依赖于前者请求之后的结果，或者是d依赖于a，b，c…等函数这些情形，在第一种情况中会出现回调嵌套的情形<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">a()&#123;</span><br><span class="line">	b()&#123;</span><br><span class="line">		c()&#123;</span><br><span class="line">			...</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>而第二种情况中，为了能更快获取到a，b，c…等的回调内容，会考虑进行并发请求，而这些又该如何解决呢？请继续往下看。</p>
+<a id="more"></a>
+<hr>
+<h4 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h4><p>针对第一种情况，我们可以把异步回调以同步的写法表示出来<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">async</span>(<span class="params"></span>)</span>&#123;&#125;</span><br><span class="line"><span class="comment">//传入两个参数，一个数组，一个函数</span></span><br><span class="line"><span class="comment">//数组用来存放需要顺序执行的回调，</span></span><br><span class="line"><span class="comment">//函数执行有两种情况，一种是顺序执行完数组中的元素后执行，另一种往下看</span></span><br><span class="line"><span class="keyword">async</span>.prototype.waterfall = <span class="function"><span class="keyword">function</span>(<span class="params">arr,cb</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> index = <span class="number">0</span>;<span class="comment">//标记位，标记进行到第几个回调</span></span><br><span class="line">  <span class="keyword">let</span> len = arr.length;<span class="comment">//记录数组长度</span></span><br><span class="line">  <span class="keyword">let</span> callback = cb || <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;&#125;<span class="comment">//最后执行的回调，如果没有就执行一个空函数</span></span><br><span class="line">  <span class="comment">//done是每个函数的最后一个参数，用来标记回调已经结束，执行下一个回调</span></span><br><span class="line">  <span class="keyword">let</span> done = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="comment">//将类数组arguments转化为数组，</span></span><br><span class="line">    <span class="comment">//done函数第一个参数控制是否直接去执行cb，如果为真则直接去执行，否则继续顺序执行</span></span><br><span class="line">    <span class="comment">//done还能传入需要传给下一个回调的参数</span></span><br><span class="line">    <span class="keyword">var</span> args = <span class="built_in">Array</span>.prototype.slice.call(<span class="built_in">arguments</span>);</span><br><span class="line">    <span class="comment">//如果第一个参数为真或者已经把所有函数都执行了一次，则执行最终的回调</span></span><br><span class="line">    <span class="keyword">if</span>(args[<span class="number">0</span>] || index == len) &#123;</span><br><span class="line">      callback.apply(<span class="literal">null</span>，args.slice(<span class="number">1</span>));</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//如果还没执行完则继续执行</span></span><br><span class="line">    <span class="keyword">if</span>(index&lt;len)&#123;</span><br><span class="line">      args.push(done);<span class="comment">//注入函数参数done</span></span><br><span class="line">      arr[index++].apply(<span class="literal">null</span>,args.slice(<span class="number">1</span>));</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">//启动</span></span><br><span class="line">  done(<span class="literal">null</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>主要思路就是通过一个done函数对顺序执行进行控制，然后还需要设置一个观测值记录已经执行了多少个回调。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> b = <span class="keyword">new</span> <span class="keyword">async</span>();</span><br><span class="line"><span class="keyword">let</span> c = <span class="function"><span class="keyword">function</span>(<span class="params">done</span>)</span>&#123;</span><br><span class="line">   setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">     <span class="built_in">console</span>.log(<span class="number">111</span>)</span><br><span class="line">     done(<span class="literal">null</span>,<span class="string">"111"</span>); </span><br><span class="line">   &#125;,<span class="number">300</span>)</span><br><span class="line"> &#125;;</span><br><span class="line"> <span class="keyword">let</span> d = <span class="function"><span class="keyword">function</span>(<span class="params">p1,done</span>)</span>&#123;</span><br><span class="line">   setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">     <span class="built_in">console</span>.log(<span class="number">222</span>);</span><br><span class="line">     done(<span class="literal">null</span>)</span><br><span class="line">   &#125;,<span class="number">200</span>);</span><br><span class="line"> &#125;</span><br><span class="line"> b.waterfall([c,d],<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">   <span class="built_in">console</span>.log(<span class="number">3333</span>)</span><br><span class="line"> &#125;)</span><br></pre></td></tr></table></figure></p>
+<p>最终会顺序输出111，222，333；</p>
+<hr>
+<p>针对第二种情况，在阿里文学读书签约活动中遇到需要向芝麻信用和支付宝分别发起请求获取状态，对于在依赖限制情况下进行并发请求，主要思路是可以设置一个变量计数器，等到需要的依赖都返回之后执行下一个请求。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//假设d依赖于a,b</span></span><br><span class="line"><span class="keyword">let</span> rec = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">let</span> globalData = &#123;&#125;;</span><br><span class="line">a()&#123;</span><br><span class="line">	......</span><br><span class="line">	<span class="comment">//成功获取到数据后存在全局变量globalData中</span></span><br><span class="line">	globalData[aData] = &#123;...&#125;;</span><br><span class="line">	++ret === <span class="number">2</span> &amp;&amp; d()</span><br><span class="line">&#125;</span><br><span class="line">b()&#123;</span><br><span class="line">	......</span><br><span class="line">	<span class="comment">//成功获取到数据后存在全局变量globalData中</span></span><br><span class="line">	globalData[bData] = &#123;...&#125;;</span><br><span class="line">	++ret === <span class="number">2</span> &amp;&amp; d()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>以上的这些解决方法其实都可以用Promise进行实现。</p>
+<hr>
+<h4 id="Promise是什么"><a href="#Promise是什么" class="headerlink" title="Promise是什么"></a>Promise是什么</h4><p>Promise是在<strong>ES6</strong>中出现的一个异步解决方法，它是一个状态机，初态是<strong>Pending(待解决)</strong>，可以通过<strong>resolve和reject</strong>方法将其状态变为<strong>fulfiiling(成功)</strong>和<strong>rejected(失败)</strong>，状态一旦变化之后，那么就不会再发生改变，而且其值能一直保存下来，之后还能再获取到原来的值，而不像事件监听，如果发生的时候没监听到，那么之后再去监听也不能获取到原来的值，它还可以进行链式调用<strong>a.then().then()…</strong>，可以用来解决回调地狱的问题。</p>
+<hr>
+<h4 id="Promise的用法"><a href="#Promise的用法" class="headerlink" title="Promise的用法"></a>Promise的用法</h4><ul>
+<li>区分<strong>Promise.all和Promise.race</strong>，它们都是需要传入一个数组作为参数，数组中的元素都是<strong>promise</strong>对象，前者需要等到数组中所有<strong>promise</strong>对象的状态都确定之后才会继续往下执行，而后者则是哪个<strong>promise</strong>对象的状态先确定则将其返回的值作为参数继续往下执行。</li>
+<li><strong>resolve和reject</strong>，在new Promise实例的时候，需要传入一个函数<strong>fn</strong>作为参数，而函数中还有两个参数，就是<strong>resolve和reject(当然也可以用其他命名)</strong><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//fn就是创建实例时传入的参数，promise则是指向Promise实例的上下文</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">doResolve</span>(<span class="params">fn, promise</span>) </span>&#123;</span><br><span class="line">  <span class="comment">//记录下是否已经执行</span></span><br><span class="line">  <span class="keyword">var</span> done = <span class="literal">false</span>;</span><br><span class="line">  <span class="comment">//tryCallTwo就是将两个函数参数注入到fn中并执行fn</span></span><br><span class="line">  <span class="keyword">var</span> res = tryCallTwo(fn, <span class="function"><span class="keyword">function</span> (<span class="params">value</span>) </span>&#123;</span><br><span class="line">    <span class="comment">//这里就是只有第一个resolve或者reject能生效的原因，调用过一次resolve或者reject后done变为true</span></span><br><span class="line">    <span class="keyword">if</span> (done) <span class="keyword">return</span>;</span><br><span class="line">    done = <span class="literal">true</span>;</span><br><span class="line">    <span class="comment">//调用Promise内部定义的resolve函数，并将值作为参数传到then方法中</span></span><br><span class="line">    resolve(promise, value);</span><br><span class="line">  &#125;, <span class="function"><span class="keyword">function</span> (<span class="params">reason</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (done) <span class="keyword">return</span>;</span><br><span class="line">    done = <span class="literal">true</span>;</span><br><span class="line">    reject(promise, reason);</span><br><span class="line">  &#125;);</span><br><span class="line">  <span class="keyword">if</span> (!done &amp;&amp; res === IS_ERROR) &#123;</span><br><span class="line">    done = <span class="literal">true</span>;</span><br><span class="line">    reject(promise, LAST_ERROR);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">resolve</span>(<span class="params">self, newValue</span>) </span>&#123;</span><br><span class="line">  ......省略一部分</span><br><span class="line">  <span class="comment">//如果传入的是基本类型，则直接保存在_value，</span></span><br><span class="line">  <span class="comment">//如果传入的值是对象或者函数，则进行处理后再保存在_value，通过doResolve循环调用实现</span></span><br><span class="line">  <span class="keyword">if</span> (</span><br><span class="line">    newValue &amp;&amp;</span><br><span class="line">    (<span class="keyword">typeof</span> newValue === <span class="string">'object'</span> || <span class="keyword">typeof</span> newValue === <span class="string">'function'</span>)</span><br><span class="line">  ) &#123;</span><br><span class="line">	<span class="comment">//获取newValue对象的then方法，也就是说可以传入一个含then属性的对象</span></span><br><span class="line">    <span class="keyword">var</span> then = getThen(newValue);</span><br><span class="line">    ......省略</span><br><span class="line">    <span class="keyword">if</span> (</span><br><span class="line">      then === self.then &amp;&amp;</span><br><span class="line">      newValue <span class="keyword">instanceof</span> <span class="built_in">Promise</span></span><br><span class="line">    ) &#123;</span><br><span class="line">      self._state = <span class="number">3</span>;</span><br><span class="line">      self._value = newValue;</span><br><span class="line">      finale(self);</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">typeof</span> then === <span class="string">'function'</span>) &#123;<span class="comment">//如果then是函数则执行resolve</span></span><br><span class="line">      doResolve(then.bind(newValue), self);</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  self._state = <span class="number">1</span>;</span><br><span class="line">  self._value = newValue;</span><br><span class="line">  finale(self);</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>从上面可以看出，在new Promise实例的时候，需要传入一个函数<strong>fn</strong>或者是含<strong>then</strong>属性的对象作为参数，然后该参数会通过<strong>doResolve</strong>方法注入两个函数参数(实现<strong>resolve和reject</strong>的功能)，<strong>resolve</strong>中还能传入参数，分别是基本类型，<strong>function</strong>，<strong>另一个promise</strong>，最后将结果保存在<strong>_value</strong>中，接着我们可以通过then方法进行链式调用，而<strong>_value</strong>中的的值则传递给then作为then的参数，主要是通过<strong>handleResolve</strong>方法实现的，而且在调用then会返回一个新的promise实例，从而保证了promise的状态只能变更一次的效果<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Promise</span>.prototype.then = <span class="function"><span class="keyword">function</span>(<span class="params">onFulfilled, onRejected</span>) </span>&#123;</span><br><span class="line">  ......省略</span><br><span class="line">  <span class="comment">//生成新的实例，并最终返回</span></span><br><span class="line">  <span class="keyword">var</span> res = <span class="keyword">new</span> <span class="built_in">Promise</span>(noop);</span><br><span class="line">  <span class="comment">//Handler的作用是把then中传入的函数参数绑定到res的执行环境中</span></span><br><span class="line">  handle(<span class="keyword">this</span>, <span class="keyword">new</span> Handler(onFulfilled, onRejected, res));</span><br><span class="line">  <span class="keyword">return</span> res;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">handle</span>(<span class="params">self, deferred</span>) </span>&#123;</span><br><span class="line">  ......省略</span><br><span class="line">  handleResolved(self, deferred);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">handleResolved</span>(<span class="params">self, deferred</span>) </span>&#123;</span><br><span class="line">  asap(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">//根据promise不同的状态执行不同的函数，1是成功，2是失败</span></span><br><span class="line">    <span class="keyword">var</span> cb = self._state === <span class="number">1</span> ? deferred.onFulfilled : deferred.onRejected;</span><br><span class="line">    <span class="comment">//如果cb是null，那么就会直接将_value中的值传递下去</span></span><br><span class="line">    <span class="keyword">if</span> (cb === <span class="literal">null</span>) &#123;</span><br><span class="line">      <span class="keyword">if</span> (self._state === <span class="number">1</span>) &#123;</span><br><span class="line">        resolve(deferred.promise, self._value);</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        reject(deferred.promise, self._value);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//如果是函数，则将_value的值注入作为参数，并返回函数的结果</span></span><br><span class="line">    <span class="keyword">var</span> ret = tryCallOne(cb, self._value);</span><br><span class="line">    <span class="keyword">if</span> (ret === IS_ERROR) &#123;</span><br><span class="line">      reject(deferred.promise, LAST_ERROR);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="comment">//将then函数的返回值存到_value中，实现链式调用</span></span><br><span class="line">      resolve(deferred.promise, ret);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>经过上面的分析和梳理，应该对promise的运行机制和使用方式也很清晰了</p>
+<ul>
+<li>在new Promise实例的时候可以传入函数或者含then的对象作为参数</li>
+<li><p>在then中如果传入的不是函数，那么上一个_value的值将直接传给下一个then作为参数，所以下面将会输出<strong>hahaha</strong>而不是<strong>lalala</strong></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> p = <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span>(<span class="params">resolve,reject</span>)</span>&#123;</span><br><span class="line">	resolve(<span class="string">'hahaha'</span>)</span><br><span class="line">&#125;)</span><br><span class="line">p.then(<span class="built_in">Promise</span>.resolve(<span class="string">'lalala'</span>)).then(<span class="function"><span class="keyword">function</span>(<span class="params">arg</span>)</span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(arg)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>为了保证状态只能改变一次，每次链式调用过程中都会创建新的promise实例</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> a = <span class="keyword">new</span> <span class="built_in">Promise</span>(...)</span><br><span class="line">b = a.then(...)</span><br><span class="line"><span class="built_in">console</span>.log(a === b) <span class="comment">//false</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>promise中用了很多参数注入的方法，例如resolve和reject，_value的传递等</p>
+</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/post-1/" rel="next" title="wepy浅析">
+                <i class="fa fa-chevron-left"></i> wepy浅析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/post-3/" rel="prev" title="JS的原型链和继承">
+                JS的原型链和继承 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">charliemei</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                友情链接
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://kalasearch.cn" title="卡拉搜索" target="_blank">卡拉搜索</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#发现问题"><span class="nav-number">1.</span> <span class="nav-text">发现问题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#解决方案"><span class="nav-number">2.</span> <span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Promise是什么"><span class="nav-number">3.</span> <span class="nav-text">Promise是什么</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Promise的用法"><span class="nav-number">4.</span> <span class="nav-text">Promise的用法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">charliemei</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

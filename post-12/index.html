@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="前端,frontend,翻译,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="原文地址：Everything You Need to Know About Date in JavaScript原文作者：Zell Liew译者: charlie mei  在 Javascript 中日期很奇怪，它让我们紧张不安，以至于我们需要找到其他库(像 Date-fns 和 Moment)在我们需要使用日期和时间的时候(哈！)。 但是我们不总是需要使用库。如果你知道需要注意些什么，日期">
+<meta name="keywords" content="前端,frontend,翻译">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[译]Javascript 中你需要知道的一切关于日期的事情">
+<meta property="og:url" content="https://github.com/meijintao233/meijintao233.github.io/post-12/index.html">
+<meta property="og:site_name" content="charliemei">
+<meta property="og:description" content="原文地址：Everything You Need to Know About Date in JavaScript原文作者：Zell Liew译者: charlie mei  在 Javascript 中日期很奇怪，它让我们紧张不安，以至于我们需要找到其他库(像 Date-fns 和 Moment)在我们需要使用日期和时间的时候(哈！)。 但是我们不总是需要使用库。如果你知道需要注意些什么，日期">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://css-tricks.com/wp-content/uploads/2019/06/new-date-invalid.png">
+<meta property="og:image" content="https://css-tricks.com/wp-content/uploads/2019/06/datestring-10june.png">
+<meta property="og:image" content="https://css-tricks.com/wp-content/uploads/2019/06/datestring-local.png">
+<meta property="og:image" content="https://css-tricks.com/wp-content/uploads/2019/06/mdn.png">
+<meta property="og:image" content="https://css-tricks.com/wp-content/uploads/2019/06/now.png">
+<meta property="og:image" content="https://css-tricks.com/wp-content/uploads/2019/06/33march.png">
+<meta property="og:image" content="https://css-tricks.com/wp-content/uploads/2019/06/33march-2.png">
+<meta property="og:updated_time" content="2020-07-24T11:23:07.428Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[译]Javascript 中你需要知道的一切关于日期的事情">
+<meta name="twitter:description" content="原文地址：Everything You Need to Know About Date in JavaScript原文作者：Zell Liew译者: charlie mei  在 Javascript 中日期很奇怪，它让我们紧张不安，以至于我们需要找到其他库(像 Date-fns 和 Moment)在我们需要使用日期和时间的时候(哈！)。 但是我们不总是需要使用库。如果你知道需要注意些什么，日期">
+<meta name="twitter:image" content="https://css-tricks.com/wp-content/uploads/2019/06/new-date-invalid.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://github.com/meijintao233/meijintao233.github.io/post-12/">
+
+
+
+
+
+  <title>[译]Javascript 中你需要知道的一切关于日期的事情 | charliemei</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">charliemei</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            links
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/meijintao233/meijintao233.github.io/post-12/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="charliemei">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="charliemei">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">[译]Javascript 中你需要知道的一切关于日期的事情</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-09-15T19:50:45+08:00">
+                2019-09-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>原文地址：<a href="https://css-tricks.com/everything-you-need-to-know-about-date-in-javascript/?source=post_page---------------------------" target="_blank" rel="noopener">Everything You Need to Know About Date in JavaScript</a><br>原文作者：<a href="https://zellwk.com/blog/" target="_blank" rel="noopener">Zell Liew</a><br>译者: <a href="https://meijintao233.github.io/" target="_blank" rel="noopener">charlie mei</a></p>
+</blockquote>
+<p>在 Javascript 中日期很奇怪，它让我们紧张不安，以至于我们需要找到其他库(像 Date-fns 和 Moment)在我们需要使用日期和时间的时候(哈！)。</p>
+<p>但是我们不总是需要使用库。如果你知道需要注意些什么，日期实际上相当简单。在本文中，我会引导你在 Javascript 中你需要知道的一切关于日期的事情。</p>
+<p>首先，我们先承认时区的存在。</p>
+<hr>
+<h2 id="时区"><a href="#时区" class="headerlink" title="时区"></a>时区</h2><p>世界上有数以百计的时区。在 Javascript 中，我们只关心两个——本地时间和协调世界时(UTC)。</p>
+<ul>
+<li><strong>本地时间</strong>涉及你电脑所在的时区</li>
+<li><strong>UTC</strong>是现实中格林尼治标准时间(GMT)的代名词</li>
+</ul>
+<p>在 Javascript 中(除了一个)几乎每个日期方法默认都会给你本地时间或者日期。假如你指定了 UTC 那么你只能得到 UTC。</p>
+<p>有了这个，我们可以谈一下创建日期了。</p>
+<hr>
+<h2 id="创建日期"><a href="#创建日期" class="headerlink" title="创建日期"></a>创建日期</h2><p>你可以用<code>new Date()</code>创建日期。有四种可能的方式使用<code>new Date()</code>：</p>
+<ul>
+<li>日期字符串</li>
+<li>日期参数</li>
+<li>时间戳</li>
+<li>没有参数</li>
+</ul>
+<hr>
+ <a id="more"></a>
+<h2 id="日期字符串方法"><a href="#日期字符串方法" class="headerlink" title="日期字符串方法"></a>日期字符串方法</h2><p>在日期字符串方法中，通过给<code>new Date()</code>传入日期字符串，你可以创建日期。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> <span class="built_in">Date</span>(<span class="string">"1988-03-21"</span>);</span><br></pre></td></tr></table></figure>
+<p>在写日期的时候，我们倾向于使用日期字符串。这很自然因为我们在生活中一直使用日期字符串。</p>
+<p>如果我写下<code>21-03-1988</code>， 你推导出是 1988 年 3 月 21 日说没有问题的。是吗？但是如果你在 Javascript 里写<code>21-03-1988</code>，你会得到一个<code>Invalid Date</code>。</p>
+<p><img src="https://css-tricks.com/wp-content/uploads/2019/06/new-date-invalid.png" alt="img"></p>
+<p>对于这个有充分的理由：</p>
+<p>在世界的不同地方，我们翻译日期字符串的方式不同。例如<code>11-06-2019</code>不是<code>2019年11月6日</code>就是<code>2019年6月11日</code>。但是你不能确定我指的是哪一个，除非你指定我用的日期系统。</p>
+<p>在 Javascript 中，如果你想使用日期字符串，你需要使用一个全世界都接受的格式。其中一个格式就是 ISO 8601 扩展格式。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ISO 8601 Extended format</span></span><br><span class="line"><span class="string">`YYYY-MM-DDTHH:mm:ss:sssZ`</span>;</span><br></pre></td></tr></table></figure>
+<p>这是值所表示的意思：</p>
+<ul>
+<li><code>YYYY</code>：4 位数字年份</li>
+<li><code>MM</code>：2 位数字月份(其中一月是 01，12 月是 12)</li>
+<li><code>DD</code>：2 位数字日期(0 到 31)</li>
+<li><code>-</code>： 日期分隔符</li>
+<li><code>T</code>：表明时间开始</li>
+<li><code>HH</code>：24 位数字小时(0 到 23)</li>
+<li><code>mm</code>：分(0 到 59)</li>
+<li><code>ss</code>：秒(0 到 59)</li>
+<li><code>sss</code>：毫秒(0 到 999)</li>
+<li><code>:</code>：时间分隔符</li>
+<li><code>Z</code>：如果<code>Z</code>存在，日期会被设置成 UTC。如果<code>Z</code>不存在，它会是本地时间(这仅适用于提供时间的情况)</li>
+</ul>
+<p>如果你创建日期，小时，分，秒和毫秒是可选的。那么，如果你想创建 2019 年 6 月 11 日的时间，你可以这样写：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> <span class="built_in">Date</span>(<span class="string">"2019-06-11"</span>);</span><br></pre></td></tr></table></figure>
+<p>在这里要特别注意。使用日期字符串创建日期会一个巨大的问题。如果你<code>console.log</code>这个日期你会发现问题。</p>
+<p>如果你生活的区域在 GMT 之后，你会得到一个 6 月 10 日的日期。</p>
+<p><img src="https://css-tricks.com/wp-content/uploads/2019/06/datestring-10june.png" alt="img"></p>
+<p>如果你生活的区域在 GMT 之前，你会得到一个 6 月 11 日的日期。</p>
+<p>发生这个情况是因为日期字符串有一个奇怪的行为：如果你创建日期的时候没有指定时间，你得到的日期会被设置成 UTC。</p>
+<p>在上面的脚本中，当你写入<code>new Date(&quot;2019-06-11&quot;)</code>，实际上你创建了一个<code>11th June, 2019, 12am UTC</code>日期。这是生活在 GMT 之前的人会得到<code>10th June</code>而不是<code>11th June</code>的原因。</p>
+<p>如果你想用日期字符串创建当地时间的日期，你需要包括时间。当你包括时间的时候，你需要写入<code>HH</code>和<code>mm</code>的最小值(或者谷歌浏览器返回一个无效日期)。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> <span class="built_in">Date</span>(<span class="string">"2019-06-11T00:00"</span>);</span><br></pre></td></tr></table></figure>
+<p><img src="https://css-tricks.com/wp-content/uploads/2019/06/datestring-local.png" alt="img"></p>
+<p>和日期字符串有关的当地时间和 UTC 是一个可能的错误来源，这很难捕获。所以，我推荐你不要用日期字符串创建日期。</p>
+<p>(顺便提一下，MDN 警告反对日期字符串方法，因为浏览器可以不同地解析日期字符串)</p>
+<p><img src="https://css-tricks.com/wp-content/uploads/2019/06/mdn.png" alt="img"></p>
+<p>如果你想创建日期，使用参数或者时间戳。</p>
+<hr>
+<h2 id="用参数创建日期"><a href="#用参数创建日期" class="headerlink" title="用参数创建日期"></a>用参数创建日期</h2><p>你可以传入七个参数去创建日期/时间。</p>
+<ul>
+<li>Year：四位数字年份。</li>
+<li>Month：一年中的月份(0-11)。月份从 0 开始索引。如果省略默认为 0。</li>
+<li>Day：一月中的天数(1-31)。如果省略默认为 1.</li>
+<li>Hour：一天中的小时数(0-59)。如果省略默认为 0</li>
+<li>Minutes：分钟(0-59)。如果省略默认为 0。</li>
+<li>Seconds：秒(0-59)。如果省略默认为 0。</li>
+<li>Milliseconds：毫秒(0-999)。如果省略默认为 0。</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 11th June 2019, 5:23:59am, Local Time</span></span><br><span class="line"><span class="keyword">new</span> <span class="built_in">Date</span>(<span class="number">2019</span>, <span class="number">5</span>, <span class="number">11</span>, <span class="number">5</span>, <span class="number">23</span>, <span class="number">59</span>);</span><br></pre></td></tr></table></figure>
+<p>许多开发者(包括我自己)都避免使用参数方法，因为它看起来是复杂的。但实际上是相当简单。</p>
+<p>尝试从左往右读数。从左到右你插入的值越来越小：年，月，日，时，分，秒，毫秒。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> <span class="built_in">Date</span>(<span class="number">2017</span>, <span class="number">3</span>, <span class="number">22</span>, <span class="number">5</span>, <span class="number">23</span>, <span class="number">50</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// This date can be easily read if you follow the left-right formula.</span></span><br><span class="line"><span class="comment">// Year: 2017,</span></span><br><span class="line"><span class="comment">// Month: April (because month is zero-indexed)</span></span><br><span class="line"><span class="comment">// Date: 22</span></span><br><span class="line"><span class="comment">// Hours: 05</span></span><br><span class="line"><span class="comment">// Minutes: 23</span></span><br><span class="line"><span class="comment">// Seconds: 50</span></span><br></pre></td></tr></table></figure>
+<p>与日期有关的问题最多的部分是月份值是从 0 开始索引的，就像<code>January === 0</code>，<code>February === 1</code>，<code>March === 2</code>等等。</p>
+<p>我们不知道为什么 Javascript 中月份从 0 开始索引，但是与其争论为什么一月份应该是 1(不是 0)，更好的是接受在 Javascript 中月份是从 0 开始索引。一旦你接受了这个事实，使用日期会变得相当简单。</p>
+<p>下面是一些例子，会让你熟悉：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 21st March 1988, 12am, Local Time.</span></span><br><span class="line"><span class="keyword">new</span> <span class="built_in">Date</span>(<span class="number">1988</span>, <span class="number">2</span>, <span class="number">21</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 25th December 2019, 8am, Local Time.</span></span><br><span class="line"><span class="keyword">new</span> <span class="built_in">Date</span>(<span class="number">2019</span>, <span class="number">11</span>, <span class="number">25</span>, <span class="number">8</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 6th November 2023, 2:20am, Local Time</span></span><br><span class="line"><span class="keyword">new</span> <span class="built_in">Date</span>(<span class="number">2023</span>, <span class="number">10</span>, <span class="number">6</span>, <span class="number">2</span>, <span class="number">20</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 11th June 2019, 5:23:59am, Local Time</span></span><br><span class="line"><span class="keyword">new</span> <span class="built_in">Date</span>(<span class="number">2019</span>, <span class="number">5</span>, <span class="number">11</span>, <span class="number">5</span>, <span class="number">23</span>, <span class="number">59</span>);</span><br></pre></td></tr></table></figure>
+<p>用参数创建的日期都是本地时间吗？</p>
+<p>那是用参数的好处之一——你不会在本地时间和 UTC 之间感到困惑。如果你真的需要 UTC，你可以用这个方式创建 UTC 日期。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 11th June 2019, 12am, UTC.</span><br><span class="line">new Date(Date.UTC(2019, 5, 11))</span><br></pre></td></tr></table></figure>
+<h2 id="用时间戳创建日期"><a href="#用时间戳创建日期" class="headerlink" title="用时间戳创建日期"></a>用时间戳创建日期</h2><p>在 Javascript 中，时间戳是从 1970 年 1 月经过的毫秒数(1970 年 1 月也被称为 Unix 时间)。根据我的经验，你们很少使用时间戳创建时间。你们仅用时间戳在不同时间中进行比较(更多相关的在后面)。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 11th June 2019, 8am (in my Local Time, Singapore)</span></span><br><span class="line"><span class="keyword">new</span> <span class="built_in">Date</span>(<span class="number">1560211200000</span>);</span><br></pre></td></tr></table></figure>
+<h2 id="不用参数创建日期"><a href="#不用参数创建日期" class="headerlink" title="不用参数创建日期"></a>不用参数创建日期</h2><p>如果你不用参数创建日期，你会得到一个被设置成当前时间的日期(本地时间)。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> <span class="built_in">Date</span>();</span><br></pre></td></tr></table></figure>
+<p><img src="https://css-tricks.com/wp-content/uploads/2019/06/now.png" alt="img"></p>
+<p>你可以从图像中看出是我写这篇文章的时间是新加坡的 5 月 25 日早上 11 时 19 分。</p>
+<h2 id="创建时间的总结"><a href="#创建时间的总结" class="headerlink" title="创建时间的总结"></a>创建时间的总结</h2><ul>
+<li>可以用<code>new Date()</code>创建时间</li>
+<li>有四种可能的语法：<ul>
+<li>日期字符串</li>
+<li>参数</li>
+<li>时间戳</li>
+<li>无参</li>
+</ul>
+</li>
+<li>永远不要用日期字符串方法创建日期。</li>
+<li>最好用传参方法创建日期。</li>
+<li>记住(并接受)Javascript 中月份是从 0 开始索引的。</li>
+</ul>
+<p>接下来，我们讨论一下将日期转换成可读的字符串。</p>
+<h2 id="格式化日期"><a href="#格式化日期" class="headerlink" title="格式化日期"></a>格式化日期</h2><p>大多数编程语言为你提供一个格式化工具去创建任意你要的日期格式。例如，在 PHP 里，你可以写<code>date(&quot;d M Y&quot;)</code>把日期转换成<code>23 Jan 2019</code>。</p>
+<p>但是 Javascript 中没有容易的方式格式化日期。</p>
+<p>原生日期对象附带七个格式化方法。每一个方法会给你提供一个特定的值(相当的没用)。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> date = <span class="keyword">new</span> <span class="built_in">Date</span>(<span class="number">2019</span>, <span class="number">0</span>, <span class="number">23</span>, <span class="number">17</span>, <span class="number">23</span>, <span class="number">42</span>);</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>toString</code>返回<code>Wed Jan 23 2019 17:23:42 GMT+0800 (Singapore Standard Time)</code>。</li>
+<li><code>toDateString</code>返回<code>Wed Jan 23 2019</code>。</li>
+<li><code>toLocaleString</code>返回<code>23/01/2019, 17:23:42</code>。</li>
+<li><code>toLocaleDateString</code>返回<code>23/01/2019</code>。</li>
+<li><code>toGMTString</code>返回<code>Wed, 23 Jan 2019 09:23:42 GMT</code></li>
+<li><code>toUTCString</code>返回<code>Wed, 23 Jan 2019 09:23:42 GMT</code></li>
+<li><code>toISOString</code>返回<code>2019-01-23T09:23:42.079Z</code></li>
+</ul>
+<p>如果你需要自定义格式，需要自己创建。</p>
+<h2 id="实现自定义日期格式"><a href="#实现自定义日期格式" class="headerlink" title="实现自定义日期格式"></a>实现自定义日期格式</h2><p>假设你想要像<code>Thu, 23 January 2019</code>的格式。为了创建这个值，你需要知道(和使用)日期对象附带的日期方法。</p>
+<p>你可以用这四个方法得到日期：</p>
+<ul>
+<li><code>getFullYear</code>：根据本地时间得到四位数字年份</li>
+<li><code>getMonth</code>：根据本地时间得到一年中的月份(0-11)。月份从 0 开始索引</li>
+<li><code>getDate</code>：根据本地时间得到一月中的日期(1-31)。</li>
+<li><code>getDay</code>：根据本地时间得到一周中的星期几(0-6)。一周从周日(0)开始，周六(6)结束。</li>
+</ul>
+<p>为了<code>Thu, 23 January 2019</code>创建<code>23</code>和<code>2019</code>很简单，我们可以使用<code>getFullYear</code>和<code>getDate</code>去获取。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> d = <span class="keyword">new</span> <span class="built_in">Date</span>(<span class="number">2019</span>, <span class="number">0</span>, <span class="number">23</span>);</span><br><span class="line"><span class="keyword">const</span> year = d.getFullYear(); <span class="comment">// 2019</span></span><br><span class="line"><span class="keyword">const</span> date = d.getDate(); <span class="comment">// 23</span></span><br></pre></td></tr></table></figure>
+<p>获取<code>Thu</code>和<code>January</code>困难。</p>
+<p>为了获取<code>January</code>，你可以创建一个映射十二个月份到它们各自名字的对象。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> months = &#123;</span><br><span class="line">  <span class="number">0</span>: <span class="string">"January"</span>,</span><br><span class="line">  <span class="number">1</span>: <span class="string">"February"</span>,</span><br><span class="line">  <span class="number">2</span>: <span class="string">"March"</span>,</span><br><span class="line">  <span class="number">3</span>: <span class="string">"April"</span>,</span><br><span class="line">  <span class="number">4</span>: <span class="string">"May"</span>,</span><br><span class="line">  <span class="number">5</span>: <span class="string">"June"</span>,</span><br><span class="line">  <span class="number">6</span>: <span class="string">"July"</span>,</span><br><span class="line">  <span class="number">7</span>: <span class="string">"August"</span>,</span><br><span class="line">  <span class="number">8</span>: <span class="string">"September"</span>,</span><br><span class="line">  <span class="number">9</span>: <span class="string">"October"</span>,</span><br><span class="line">  <span class="number">10</span>: <span class="string">"November"</span>,</span><br><span class="line">  <span class="number">11</span>: <span class="string">"December"</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>既然月份是从 0 开始索引的，那么我们可以用数组而不是对象。它会产生同样的结果。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> months = [</span><br><span class="line">  <span class="string">"January"</span>,</span><br><span class="line">  <span class="string">"February"</span>,</span><br><span class="line">  <span class="string">"March"</span>,</span><br><span class="line">  <span class="string">"April"</span>,</span><br><span class="line">  <span class="string">"May"</span>,</span><br><span class="line">  <span class="string">"June"</span>,</span><br><span class="line">  <span class="string">"July"</span>,</span><br><span class="line">  <span class="string">"August"</span>,</span><br><span class="line">  <span class="string">"September"</span>,</span><br><span class="line">  <span class="string">"October"</span>,</span><br><span class="line">  <span class="string">"November"</span>,</span><br><span class="line">  <span class="string">"December"</span></span><br><span class="line">];</span><br></pre></td></tr></table></figure>
+<p>为了获取<code>January</code>，我们需要：</p>
+<ul>
+<li>用<code>getMonth</code>从日期中得到从 0 开始索引的月份</li>
+<li>从<code>months</code>中获取月份名字</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> monthIndex = d.getMonth();</span><br><span class="line"><span class="keyword">const</span> monthName = months[monthIndex];</span><br><span class="line"><span class="built_in">console</span>.log(monthName); <span class="comment">// January</span></span><br></pre></td></tr></table></figure>
+<p>精简版：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> monthName = months(d.getMonth());</span><br><span class="line"><span class="built_in">console</span>.log(monthName); <span class="comment">// January</span></span><br></pre></td></tr></table></figure>
+<p>你可以以同样的方式获取<code>Thu</code>。这次，我们需要一个包含一周七天的数组。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> days = [<span class="string">"Sun"</span>, <span class="string">"Mon"</span>, <span class="string">"Tue"</span>, <span class="string">"Wed"</span>, <span class="string">"Thu"</span>, <span class="string">"Fri"</span>, <span class="string">"Sat"</span>];</span><br></pre></td></tr></table></figure>
+<p>然后你：</p>
+<ul>
+<li>用<code>getDay</code>获取<code>dayIndex</code></li>
+<li>用<code>dayIndex</code>去获取<code>dayName</code></li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> dayIndex = d.getDay();</span><br><span class="line"><span class="keyword">const</span> dayName = days[dayIndex]; <span class="comment">// Thu</span></span><br></pre></td></tr></table></figure>
+<p>精简版：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> dayName = days[d.getDay()]; <span class="comment">// Thu</span></span><br></pre></td></tr></table></figure>
+<p>然后，你把你创建的变量组合起来，就可以得到格式化了的字符串。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> formatted = <span class="string">`<span class="subst">$&#123;dayName&#125;</span>, <span class="subst">$&#123;date&#125;</span> <span class="subst">$&#123;monthName&#125;</span> <span class="subst">$&#123;year&#125;</span>`</span>;</span><br><span class="line"><span class="built_in">console</span>.log(formatted); <span class="comment">// Thu, 23 January 2019</span></span><br></pre></td></tr></table></figure>
+<p>是的，它是乏味的。但是一旦掌握它，这并非不可能。</p>
+<p>如果你曾经需要创建一个自定义的格式化时间，你可以使用以下方法：</p>
+<ul>
+<li><code>getHours</code>：根据本地时间获取小时(0-23)</li>
+<li><code>getMinutes</code>：根据本地时间获取分钟(0-59)</li>
+<li><code>getSeconds</code>：根据本地时间获取秒(0-59)</li>
+<li><code>getMilliseconds</code>：根据本地时间获取毫秒(0-999)</li>
+</ul>
+<p>下一步，我们讨论一下日期比较。</p>
+<h2 id="日期比较"><a href="#日期比较" class="headerlink" title="日期比较"></a>日期比较</h2><p>如果你想知道一个日期是否在另一个之前或者之后，你可以直接用<code>&gt;</code>，<code>&lt;</code>，<code>&gt;=</code>和<code>&lt;=</code>对它们进行比较。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">const earlier = new Date(2019, 0, 26)</span><br><span class="line">const later = new Date(2019, 0, 27)</span><br><span class="line"></span><br><span class="line">console.log(earlier &lt; later) // true</span><br></pre></td></tr></table></figure>
+<p>更困难的是如果你想检测两个日期是否是完全相同的时间。你不能用<code>==</code>或者<code>===</code>进行比较。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> a = <span class="keyword">new</span> <span class="built_in">Date</span>(<span class="number">2019</span>, <span class="number">0</span>, <span class="number">26</span>);</span><br><span class="line"><span class="keyword">const</span> b = <span class="keyword">new</span> <span class="built_in">Date</span>(<span class="number">2019</span>, <span class="number">0</span>, <span class="number">26</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(a == b); <span class="comment">// false</span></span><br><span class="line"><span class="built_in">console</span>.log(a === b); <span class="comment">// false</span></span><br></pre></td></tr></table></figure>
+<p>为了检测两个日期是否是相同的时间，你可以用<code>getTime</code>检测它们的时间戳。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> isSameTime = <span class="function">(<span class="params">a, b</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> a.getTime() === b.getTime();</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> a = <span class="keyword">new</span> <span class="built_in">Date</span>(<span class="number">2019</span>, <span class="number">0</span>, <span class="number">26</span>);</span><br><span class="line"><span class="keyword">const</span> b = <span class="keyword">new</span> <span class="built_in">Date</span>(<span class="number">2019</span>, <span class="number">0</span>, <span class="number">26</span>);</span><br><span class="line"><span class="built_in">console</span>.log(isSameTime(a, b)); <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+<p>如果你想检测两个日期是否是相同的天，你可以检测它们<code>getFullYear</code>，<code>getMonth</code>和<code>getDate</code>返回的值。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> isSameDay = <span class="function">(<span class="params">a, b</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    a.getFullYear() === b.getFullYear() &amp;&amp;</span><br><span class="line">    a.getMonth() === b.getMonth() &amp;&amp;</span><br><span class="line">    a.getDate() === b.getDate()</span><br><span class="line">  );</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> a = <span class="keyword">new</span> <span class="built_in">Date</span>(<span class="number">2019</span>, <span class="number">0</span>, <span class="number">26</span>, <span class="number">10</span>); <span class="comment">// 26 Jan 2019, 10am</span></span><br><span class="line"><span class="keyword">const</span> b = <span class="keyword">new</span> <span class="built_in">Date</span>(<span class="number">2019</span>, <span class="number">0</span>, <span class="number">26</span>, <span class="number">12</span>); <span class="comment">// 26 Jan 2019, 12pm</span></span><br><span class="line"><span class="built_in">console</span>.log(isSameDay(a, b)); <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+<p>还有最后一件事我们得涵盖的。</p>
+<h2 id="从另一个日期获取日期"><a href="#从另一个日期获取日期" class="headerlink" title="从另一个日期获取日期"></a>从另一个日期获取日期</h2><p>有两个可能的你想从另一个日期获取日期的脚本。</p>
+<ul>
+<li>从另一个日期设置特定的日期/时间值</li>
+<li>从另一个日期增/减一个增量</li>
+</ul>
+<h2 id="设置一个特定的日期-时间"><a href="#设置一个特定的日期-时间" class="headerlink" title="设置一个特定的日期/时间"></a>设置一个特定的日期/时间</h2><p>你可以使用这些方法从另一个日期设置日期/时间：</p>
+<ul>
+<li><code>setFullYear</code>：在本地时间设置 4 位数年份</li>
+<li><code>setMonth</code>：在本地时间设置月份</li>
+<li><code>setDate</code>：在本地时间设置天数</li>
+<li><code>setHours</code>：在本地时间设置小时</li>
+<li><code>setMinutes</code>：在本地时间设置分钟</li>
+<li><code>setSeconds</code>：在本地时间设置秒</li>
+<li><code>setMilliseconds</code>：在本地时间设置毫秒</li>
+</ul>
+<p>例如，如果你想把日期设置成本月中的第 15 天，你可以用<code>setDate(15)</code>。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> d = <span class="keyword">new</span> <span class="built_in">Date</span>(<span class="number">2019</span>, <span class="number">0</span>, <span class="number">10</span>);</span><br><span class="line">d.setDate(<span class="number">15</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(d); <span class="comment">// 15 January 2019</span></span><br></pre></td></tr></table></figure>
+<p>如果你想把月份设置成六月，你可以用<code>setMonth</code>。(记住，Javascript 中月份是从 0 开始索引的！)</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> d = <span class="keyword">new</span> <span class="built_in">Date</span>(<span class="number">2019</span>, <span class="number">0</span>, <span class="number">10</span>);</span><br><span class="line">d.setMonth(<span class="number">5</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(d); <span class="comment">// 10 June 2019</span></span><br></pre></td></tr></table></figure>
+<p>注意：上面的 setter 方法会改变原始时间对象。实践中，我们不应该改变对象。相反我们应该在新的时间对象上执行这些操作。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> d = <span class="keyword">new</span> <span class="built_in">Date</span>(<span class="number">2019</span>, <span class="number">0</span>, <span class="number">10</span>);</span><br><span class="line"><span class="keyword">const</span> newDate = <span class="keyword">new</span> <span class="built_in">Date</span>(d);</span><br><span class="line">newDate.setMonth(<span class="number">5</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(d); <span class="comment">// 10 January 2019</span></span><br><span class="line"><span class="built_in">console</span>.log(newDate); <span class="comment">// 10 June 2019</span></span><br></pre></td></tr></table></figure>
+<h2 id="从另一个日期增-减一个增量"><a href="#从另一个日期增-减一个增量" class="headerlink" title="从另一个日期增/减一个增量"></a>从另一个日期增/减一个增量</h2><p>增量是一个变化。从另一个日期加/减一个增量，我意思是：你想从另一个日期获取一个 X 日期。可能是 X 年，X 月，x 日等等。</p>
+<p>为了获取增量，你需要知道当前日期的值。你可以用这些方法获取它：</p>
+<ul>
+<li><code>getFullYear</code>：根据本地时间得到四位数字年份</li>
+<li><code>getMonth</code>：根据本地时间得到一年中的月份(0-11)。月份从 0 开始索引</li>
+<li><code>getDate</code>：根据本地时间得到一月中的日期(1-31)。</li>
+<li><code>getDay</code>：根据本地时间得到一周中的星期几(0-6)。一周从周日(0)开始，周六(6)结束。</li>
+<li><code>getHours</code>：根据本地时间获取小时(0-23)</li>
+<li><code>getMinutes</code>：根据本地时间获取分钟(0-59)</li>
+<li><code>getSeconds</code>：根据本地时间获取秒(0-59)</li>
+<li><code>getMilliseconds</code>：根据本地时间获取毫秒(0-999)</li>
+</ul>
+<p>有两个常见方法增/减一个增量。第一个在 Stack Overflow 更受欢迎。它简洁，但很难掌握。第二个方法更加冗长，但很容易理解。</p>
+<p>我们来看看这两种方法。</p>
+<p>假设你想获得一个三天后的日期。在这个例子中，我们也假定今天是 2019 年 3 月 28 日。(当我们使用固定日期时这更容易解释)。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Assumes today is 28 March 2019</span></span><br><span class="line"><span class="keyword">const</span> today = <span class="keyword">new</span> <span class="built_in">Date</span>(<span class="number">2019</span>, <span class="number">2</span>, <span class="number">28</span>);</span><br></pre></td></tr></table></figure>
+<p>首先，我们创建一个新的日期对象(这样我们没有改变原始日期对象)</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> finalDate = <span class="keyword">new</span> <span class="built_in">Date</span>(today);</span><br></pre></td></tr></table></figure>
+<p>接着，我们需要知道我们想改变的值。既然我们打算改变天数，我们可以用<code>getDate</code>获取天。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> currentDate = today.getDate();</span><br></pre></td></tr></table></figure>
+<p>我们想要一个三天后的日期。我们将增加增量(3)到当前日期。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">finalDate.setDate(currentDate + <span class="number">3</span>);</span><br></pre></td></tr></table></figure>
+<p>设置方式的完整的代码：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> today = <span class="keyword">new</span> <span class="built_in">Date</span>(<span class="number">2019</span>, <span class="number">2</span>, <span class="number">28</span>);</span><br><span class="line"><span class="keyword">const</span> finalDate = <span class="keyword">new</span> <span class="built_in">Date</span>(today);</span><br><span class="line">finalDate.setDate(today.getDate() + <span class="number">3</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(finalDate); <span class="comment">// 31 March 2019</span></span><br></pre></td></tr></table></figure>
+<p>现在我们使用<code>getFullYear</code>，<code>getMonth</code>，<code>getDate</code>和其他 getter 方法直到我们达到我们想要改变的值的类型。然后，我们用<code>new Date()</code>创建最终日期。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> today = <span class="keyword">new</span> <span class="built_in">Date</span>(<span class="number">2019</span>, <span class="number">2</span>, <span class="number">28</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Getting required values</span></span><br><span class="line"><span class="keyword">const</span> year = today.getFullYear();</span><br><span class="line"><span class="keyword">const</span> month = today.getMonh();</span><br><span class="line"><span class="keyword">const</span> day = today.getDate();</span><br><span class="line"></span><br><span class="line"><span class="comment">// Creating a new Date (with the delta)</span></span><br><span class="line"><span class="keyword">const</span> finalDate = <span class="keyword">new</span> <span class="built_in">Date</span>(year, month, day + <span class="number">3</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(finalDate); <span class="comment">// 31 March 2019</span></span><br></pre></td></tr></table></figure>
+<p>两种方法都有效。选一种并坚持下去。</p>
+<h2 id="自动日期校正"><a href="#自动日期校正" class="headerlink" title="自动日期校正"></a>自动日期校正</h2><p>如果你提供一个超过它可接受范围的值给 Date，Javascript 会自动为你重新计算日期。</p>
+<p>这是一个例子。让我们假设我们设置日期为 2019 年 3 月 33 日。(日历上没有 3 月 33 日)。这种情况下，Javascript 自动调整 3 月 33 日到 4 月 2 日。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 33rd March =&gt; 2nd April</span><br><span class="line">new Date(2019, 2, 33)</span><br></pre></td></tr></table></figure>
+<p><img src="https://css-tricks.com/wp-content/uploads/2019/06/33march.png" alt="img"></p>
+<p>这意味着你不需要担心计算分钟，小时，天，月等等。当创建一个增量，Javascript 自动为你处理它。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 33rd March =&gt; 2nd April</span><br><span class="line">new Date(2019, 2, 30 + 3)</span><br></pre></td></tr></table></figure>
+<p><img src="https://css-tricks.com/wp-content/uploads/2019/06/33march-2.png" alt="img"></p>
+<p>以上就是你需要知道的关于 Javascript 原生日期对象的所有东西。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/前端/" rel="tag"># 前端</a>
+          
+            <a href="/tags/frontend/" rel="tag"># frontend</a>
+          
+            <a href="/tags/翻译/" rel="tag"># 翻译</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/post-11/" rel="next" title="谷歌扩展开发小记">
+                <i class="fa fa-chevron-left"></i> 谷歌扩展开发小记
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/post-14/" rel="prev" title="一次 webpack 分享小记">
+                一次 webpack 分享小记 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">charliemei</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                友情链接
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://kalasearch.cn" title="卡拉搜索" target="_blank">卡拉搜索</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#时区"><span class="nav-number">1.</span> <span class="nav-text">时区</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建日期"><span class="nav-number">2.</span> <span class="nav-text">创建日期</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#日期字符串方法"><span class="nav-number">3.</span> <span class="nav-text">日期字符串方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#用参数创建日期"><span class="nav-number">4.</span> <span class="nav-text">用参数创建日期</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#用时间戳创建日期"><span class="nav-number">5.</span> <span class="nav-text">用时间戳创建日期</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#不用参数创建日期"><span class="nav-number">6.</span> <span class="nav-text">不用参数创建日期</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建时间的总结"><span class="nav-number">7.</span> <span class="nav-text">创建时间的总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#格式化日期"><span class="nav-number">8.</span> <span class="nav-text">格式化日期</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现自定义日期格式"><span class="nav-number">9.</span> <span class="nav-text">实现自定义日期格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#日期比较"><span class="nav-number">10.</span> <span class="nav-text">日期比较</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#从另一个日期获取日期"><span class="nav-number">11.</span> <span class="nav-text">从另一个日期获取日期</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#设置一个特定的日期-时间"><span class="nav-number">12.</span> <span class="nav-text">设置一个特定的日期/时间</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#从另一个日期增-减一个增量"><span class="nav-number">13.</span> <span class="nav-text">从另一个日期增/减一个增量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#自动日期校正"><span class="nav-number">14.</span> <span class="nav-text">自动日期校正</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">charliemei</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

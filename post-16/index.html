@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="frontend,node,v8,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="该版本是 node.js 的 Version 13，通过 VS Code 一步一步调试，大致了解了 node 的启动流程，同时也对 C++ 的语法和使用有了一些了解">
+<meta name="keywords" content="frontend,node,v8">
+<meta property="og:type" content="article">
+<meta property="og:title" content="node.js 启动流程解析">
+<meta property="og:url" content="https://github.com/meijintao233/meijintao233.github.io/post-16/index.html">
+<meta property="og:site_name" content="charliemei">
+<meta property="og:description" content="该版本是 node.js 的 Version 13，通过 VS Code 一步一步调试，大致了解了 node 的启动流程，同时也对 C++ 的语法和使用有了一些了解">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200317203257553.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200317204723671.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200317204915051.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200317205616775.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200317211659671.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200317211844333.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200317212218589.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200317212903968.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200317214628489.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200317214915223.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200317215110070.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200317215200324.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200317215631787.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200317215708278.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200317215751443.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200317220638559.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200317220705582.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200317222210705.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200317222726981.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200317222941629.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200317223125934.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200317223538497.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200317223643186.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318084754293.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318085218071.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318085548818.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318090015021.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318090716146.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318090850322.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318090915722.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318091604665.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318091202022.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318092310287.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318093028160.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318093241835.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318093809923.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318100709188.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318101034652.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318101518634.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318101859170.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318104708266.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318105229316.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318105815473.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318105932279.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318110142682.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318110708041.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318110815452.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318111731346.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318114432240.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318114840841.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318122035496.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318115113607.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318115840921.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318115900680.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318120141916.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318120315197.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318120639781.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318121845353.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318122321385.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318122509396.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318122657817.png">
+<meta property="og:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200318122751188.png">
+<meta property="og:updated_time" content="2020-07-24T11:23:07.499Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="node.js 启动流程解析">
+<meta name="twitter:description" content="该版本是 node.js 的 Version 13，通过 VS Code 一步一步调试，大致了解了 node 的启动流程，同时也对 C++ 的语法和使用有了一些了解">
+<meta name="twitter:image" content="https://github.com/meijintao233/meijintao233.github.io/post-16/image-20200317203257553.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://github.com/meijintao233/meijintao233.github.io/post-16/">
+
+
+
+
+
+  <title>node.js 启动流程解析 | charliemei</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">charliemei</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            links
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/meijintao233/meijintao233.github.io/post-16/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="charliemei">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="charliemei">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">node.js 启动流程解析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-03-18T20:33:04+08:00">
+                2020-03-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>该版本是 node.js 的 Version 13，通过 VS Code 一步一步调试，大致了解了 node 的启动流程，同时也对 C++ 的语法和使用有了一些了解</p>
+<a id="more"></a>
+<h2 id="从入口开始"><a href="#从入口开始" class="headerlink" title="从入口开始"></a>从入口开始</h2><p><img src="./image-20200317203257553.png" alt="image-20200317203257553"></p>
+<p>在 <code>node_main.cc</code> 文件中，这一行就是本次旅程的起点，<code>node::start</code> 启动并将 <code>argc</code> ( node 接收到的参数总数)和 <code>argv</code> (参数地址)传入。</p>
+<h3 id="InitializeOncePerProcess"><a href="#InitializeOncePerProcess" class="headerlink" title="InitializeOncePerProcess"></a>InitializeOncePerProcess</h3><p><img src="./image-20200317204723671.png" alt="image-20200317204723671"></p>
+<p>在 <code>node.cc</code>文件中，这行是开始初始化进程，从名字可以看出，这里保证只执行一次</p>
+<p><img src="./image-20200317204915051.png" alt="image-20200317204915051"></p>
+<p><code>atexit</code> 函数，从命名可以知道这个是在程序即将结束时会被触发，<code>resetStdio</code> 函数用来对标准 I/O 资源的回收，包括文件描述符 <code>fd</code> 和 <code>tty</code> 相关的。</p>
+<p><img src="./image-20200317205616775.png" alt="image-20200317205616775"></p>
+<h3 id="PlatformInit"><a href="#PlatformInit" class="headerlink" title="PlatformInit"></a>PlatformInit</h3><p><code>PlatformInit</code> 函数，主要是对不同平台进行兼容并做一些平台相关的初始化工作，例如这里就是对文件描述符 <code>fd</code> 的初始化，确保进程中 <code>fd</code> <strong>0(stdin)、1(stdout)、2(stderr)</strong> 是正常的， <code>fstat</code> 会返回文件的相关信息，<strong>535</strong> 行的作用是保证 <code>fd</code> 为 <strong>0 1 2</strong> 的值都已经被占用，<code>fd</code> 分配从 <strong>3</strong> 开始，<code>fd</code> 表示的是进程能打开的文件数，系统默认是 <strong>1024</strong></p>
+<p><img src="./image-20200317211659671.png" alt="image-20200317211659671"></p>
+<p>定义并初始化 <code>act</code> 变量，根据系统的 <strong>signal</strong> 值，对不同的 <strong>signal</strong> 注册触发函数</p>
+<p><img src="./image-20200317211844333.png" alt="image-20200317211844333"></p>
+<p>通过 <code>fcntl</code> 函数读取文件的文件描述符标记，<code>fcntl</code> 的文件状态标志总共有 <strong>7</strong> 个：<strong>O_RDONLY , O_WRONLY , O_RDWR , O_APPEND , O_NONBLOCK , O_SYNC 和 O_ASYNC</strong></p>
+<p><img src="./image-20200317212218589.png" alt="image-20200317212218589"></p>
+<p><code>RegisterSignalHandler</code> 注册系统信号的触发函数，上面的是进程结束时的信号，<strong>SIGINT</strong> 当我们敲 <strong>c t r l + c</strong> 时会发出，<strong>SIGTERM</strong> 该信号可以被阻塞，等待合适时机再进行退出处理，而 <strong>SIGKILL</strong> 信号则是不能被捕获的，一旦发出则程序一定会退出，例如 <code>kill -9</code> 命令就会发出该信号</p>
+<p><img src="./image-20200317212903968.png" alt="image-20200317212903968"></p>
+<p><code>getrlimit</code> 是用来获取系统限定资源信息的函数， <strong>RLIMIT_NOFILE</strong> 的意思就是获取最大的文件描述符数，分为软限制和硬限制，软限制的值不能大于硬限制，这里利用二分搜索找出系统能设置的最大值</p>
+<h3 id="uv-setup-args"><a href="#uv-setup-args" class="headerlink" title="uv_setup_args"></a>uv_setup_args</h3><p><img src="./image-20200317214628489.png" alt="image-20200317214628489"></p>
+<p><code>uv_setup_args</code> 的作用是复制一份命令行的参数，用于赋值给 <code>process.title</code></p>
+<h3 id="InitializeNodeWithArgs"><a href="#InitializeNodeWithArgs" class="headerlink" title="InitializeNodeWithArgs"></a>InitializeNodeWithArgs</h3><p><img src="./image-20200317214915223.png" alt="image-20200317214915223"></p>
+<h3 id="RegisterBuiltinModules"><a href="#RegisterBuiltinModules" class="headerlink" title="RegisterBuiltinModules"></a>RegisterBuiltinModules</h3><p><img src="./image-20200317215110070.png" alt="image-20200317215110070"></p>
+<p><strong>node_biding.cc</strong></p>
+<p><img src="./image-20200317215200324.png" alt="image-20200317215200324" style="zoom:50%;"></p>
+<p><img src="./image-20200317215631787.png" alt="image-20200317215631787"></p>
+<p><img src="./image-20200317215708278.png" alt="image-20200317215708278"></p>
+<p><img src="./image-20200317215751443.png" alt="image-20200317215751443"></p>
+<p><code>RegisterBuiltinModules</code> 注册内置模块，使用了宏的写法，这些模块就是在 <strong>no de_XX.cc</strong> 中的模块，生成一个 <strong>modlist_internal</strong> 链表中借助 <strong>nm_link</strong> 指针指向下一个模块</p>
+<p><img src="./image-20200317220638559.png" alt="image-20200317220638559"></p>
+<p><img src="./image-20200317220705582.png" alt="image-20200317220705582"></p>
+<p><img src="./image-20200317222210705.png" alt="image-20200317222210705"></p>
+<p>接下来是一些 Node 环境变量的配置</p>
+<p><img src="./image-20200317222726981.png" alt="image-20200317222726981"></p>
+<p>把命令行中的配置项，例如 <strong>–</strong> 或者 <strong>-</strong> 开头的从 <strong>argv</strong> 分离到 <strong>exec_argv</strong> 中</p>
+<h3 id="InitializeCodeCache"><a href="#InitializeCodeCache" class="headerlink" title="InitializeCodeCache"></a>InitializeCodeCache</h3><p><img src="./image-20200317222941629.png" alt="image-20200317222941629"></p>
+<p><strong>node_code_cache.cc</strong></p>
+<p><img src="./image-20200317223125934.png" alt="image-20200317223125934"></p>
+<p>这一步把提前编译好的 <strong>lib</strong> 下的 <strong>js</strong> 文件都存放在 <strong>code_cache</strong> 的 <strong>map</strong> 中，免去了读入文件的过程，加快启动速度</p>
+<p><img src="./image-20200317223538497.png" alt="image-20200317223538497"></p>
+<p><img src="./image-20200317223643186.png" alt="image-20200317223643186"></p>
+<p>如果使用了 <strong>openssl</strong> 则使用 <strong>ca</strong> 证书，借助 <strong>BIO</strong> 进行读取</p>
+<h3 id="per-process-v8-platform-Initialize"><a href="#per-process-v8-platform-Initialize" class="headerlink" title="per_process::v8_platform.Initialize"></a>per_process::v8_platform.Initialize</h3><p><strong>node_v8_platform-inl.h</strong></p>
+<p><img src="./image-20200318084754293.png" alt="image-20200318084754293"></p>
+<p><strong>node_platform.cc</strong></p>
+<p><img src="./image-20200318085218071.png" alt="image-20200318085218071"></p>
+<p>初始化 <strong>V8</strong> 平台相关的准备工作，包括添加运行状态追踪，生成 <strong>node</strong> 平台实例，配置多线程的线程池资源</p>
+<h3 id="v8-V8-InitializePlatform"><a href="#v8-V8-InitializePlatform" class="headerlink" title="v8::V8::InitializePlatform"></a>v8::V8::InitializePlatform</h3><p><strong>api.cc</strong></p>
+<p><img src="./image-20200318085548818.png" alt="image-20200318085548818"></p>
+<p><strong>v8.cc</strong></p>
+<p><img src="./image-20200318090015021.png" alt="image-20200318090015021"></p>
+<p>初始化 <strong>V8</strong> 平台，包括调用栈追踪和调用栈等功能的初始化</p>
+<p><strong>node</strong> 的代码中很多 <strong>v8::XX</strong> 和 <strong>v8::internal::XX</strong> 的转换，等于是在中间加多了一层，对外暴露的 <strong>API</strong> 是 <strong>v8::XX</strong>，而 <strong>v8::internal::XX</strong> 则是内部实现，这样可以将代码分离，内部的变更都不会影响外部 <strong>API</strong></p>
+<h3 id="V8-Initialize"><a href="#V8-Initialize" class="headerlink" title="V8::Initialize"></a>V8::Initialize</h3><p><strong>node.cc</strong></p>
+<p><img src="./image-20200318090716146.png" alt="image-20200318090716146"></p>
+<h3 id="v8-internal-V8-InitializeOncePerProcess"><a href="#v8-internal-V8-InitializeOncePerProcess" class="headerlink" title="v8::internal::V8::InitializeOncePerProcess"></a>v8::internal::V8::InitializeOncePerProcess</h3><p><strong>v8.cc</strong></p>
+<p><img src="./image-20200318090850322.png" alt="image-20200318090850322"></p>
+<p><img src="./image-20200318090915722.png" alt="image-20200318090915722"></p>
+<p><img src="./image-20200318091604665.png" alt="image-20200318091604665"></p>
+<p><img src="./image-20200318091202022.png" alt="image-20200318091202022"></p>
+<p>这里从命名就可以看出是只会执行一次的逻辑，类似的变量均被定义为 <strong>OnceType</strong> 类型，该类型的实质是 <strong>C++</strong> 中的 <strong>std::atomic</strong>，该类型是用来多线程中避免竞争的原子操作原语，而 <strong>init_once</strong> 则是 <strong>OnceType</strong> 类型</p>
+<p><strong>load</strong> 和 <strong>store</strong> 是读写值时使用的函数， <strong>Memory Order</strong> 意思是内存顺序，是 <strong>CPU</strong> 对指令执行优化引申的一个概念，多线程的同步机制一般有 <strong>mutex</strong> 和 <strong>atomic</strong>，前者性能消耗大于后者。</p>
+<p><strong>once.cc</strong></p>
+<p><img src="./image-20200318092310287.png" alt="image-20200318092310287"></p>
+<p>此处的 <strong>memory_order_acquire</strong> 对应的是 <strong>release-acquire</strong> 机制，保证了线程读写对其他线程的可见性，这里我们可以看到 <strong>callOnceImpl</strong> 的实现，如果 <strong>once</strong> 的状态为<strong>已完成</strong>则直接返回，否则初始化一个 <strong>expected</strong> 变量赋值为<strong>初始态</strong>，<strong>compare_exchange_strong</strong> 的作用就是做一次 <strong>CAS(compare and swap)</strong> 如果变量的值符合预期，即 <strong>初始态</strong> ，那么就更新变量的状态为 <strong>执行中</strong> ，执行 <strong>init_func</strong> 结束后，将变量状态设置为 <strong>结束态</strong> ，如果 <strong>CAS</strong> 操作没有成功，且此时状态为 <strong>执行中</strong> ，就调用<strong>sched_yield</strong> 交出执行权，这里的机制类似 <strong>JS</strong> 的 <strong>generator</strong></p>
+<h3 id="V8-InitializeOncePerProcessImpl"><a href="#V8-InitializeOncePerProcessImpl" class="headerlink" title="V8::InitializeOncePerProcessImpl"></a>V8::InitializeOncePerProcessImpl</h3><p><strong>v8.cc</strong></p>
+<p><img src="./image-20200318093028160.png" alt="image-20200318093028160"></p>
+<p><img src="./image-20200318093241835.png" alt="image-20200318093241835"></p>
+<p>这里主要是做了各种初始化操作，包括 <strong>OS</strong> ，<strong>Isolate</strong> 的线程标识 ，还注册了一系列 <strong>v8</strong> 扩展</p>
+<p>至此 <strong>node::Start</strong> 中的 <strong>InitializeOncePerProcess</strong> 完成</p>
+<h3 id="Node-Start"><a href="#Node-Start" class="headerlink" title="Node::Start"></a>Node::Start</h3><p><strong>node.cc</strong></p>
+<p><img src="./image-20200318093809923.png" alt="image-20200318093809923"></p>
+<p>初始化 <strong>params</strong> 用于 <strong>Isolate</strong> 的初始化，然后获取 <strong>snapshot(快照)</strong> ，这是 <strong>Node</strong> 引入的加快启动速度的优化，将 <strong>Isolate</strong> 和 <strong>Context</strong> 的部分初始值序列化后嵌入程序中，然后后续的初始化可以复用他们之前的 <strong>snapshot</strong></p>
+<h3 id="main-instance"><a href="#main-instance" class="headerlink" title="main_instance"></a>main_instance</h3><p><img src="./image-20200318100709188.png" alt="image-20200318100709188"></p>
+<p>生成 <strong>main_instance</strong> 实例，将 <strong>Isolate</strong> 的 <strong>params</strong> ，<strong>libuv</strong> ，先前生成的 <strong>v8_platform</strong> ，命令行参数 <strong>args</strong> ，带 <strong>–</strong> 或 <strong>-</strong> 的参数 <strong>exec_args</strong> 传入</p>
+<p><strong>node_main_instance.cc</strong></p>
+<p><img src="./image-20200318101034652.png" alt="image-20200318101034652"></p>
+<p><strong>isolate.cc</strong></p>
+<p><img src="./image-20200318101518634.png" alt="image-20200318101518634"></p>
+<p><img src="./image-20200318101859170.png" alt="image-20200318101859170"></p>
+<p>第 <strong>71</strong> 行 为 <strong>Isolate</strong> 初始化做前期工作，在第 <strong>2819</strong> 行初始化 <strong>Isolate</strong> 实例，<strong>isolate<em>data</em></strong> 保存了 <strong>Isolate</strong> 数据，<strong>isolate<em>allocator</em></strong> 保存了 <strong>Isolate</strong> 的内存地址，接着初始化了线程管理器 <strong>ThreadManager</strong> ，最后初始化了微任务队列 <strong>MicrotaskQueue</strong> 这是一个双向循环链表</p>
+<p>第 <strong>75</strong> 行在 <strong>platform</strong> 中注册 <strong>Isolate</strong> ，将该 <strong>Isolate</strong> 和 <strong>eventloop</strong> 的信息记录在 <strong>map</strong> 中，便于多 <strong>Isolate</strong> 条件下的查找</p>
+<p>第 <strong>76</strong> 行根据 <strong>params</strong> 的值设置 <strong>node</strong> 的 <strong>heap</strong> 堆内存资源额度，包括新生代，老生代，<strong>semispace</strong></p>
+<p>第 <strong>77</strong> 行真正初始化 <strong>Isolate</strong>，根据 <strong>params</strong> 为 <strong>Isolate</strong> 赋值</p>
+<p><strong>api.cc</strong></p>
+<p><img src="./image-20200318104708266.png" alt="image-20200318104708266"></p>
+<p>这里设置了堆栈的资源额度限制真正开始生效，第 <strong>8224</strong> 行从 <strong>snapshot</strong> 中获取部分数据赋值给 <strong>Isolate</strong></p>
+<p><img src="./image-20200318105229316.png" alt="image-20200318105229316"></p>
+<p><strong>isolate_scope</strong> 负责记录 <strong>isolate</strong> 被线程访问的情况，通过 <strong>EntryStackItem</strong> 记录</p>
+<p>至此，<strong>Isolate</strong> 的初始化正式完成</p>
+<p><img src="./image-20200318105815473.png" alt="image-20200318105815473"></p>
+<p>保存一份 <strong>IsolateData</strong> 在 <strong>NodeMainInstance</strong></p>
+<h3 id="NodeMainInstance-Run"><a href="#NodeMainInstance-Run" class="headerlink" title="NodeMainInstance::Run"></a>NodeMainInstance::Run</h3><p><img src="./image-20200318105932279.png" alt="image-20200318105932279"></p>
+<p>启动的前期工作准备就绪，这时候开始运行 <strong>main_instance</strong></p>
+<p><img src="./image-20200318110142682.png" alt="image-20200318110142682"></p>
+<p><strong>HandleSope</strong> 经常能在代码中看到，这等于是开拓了一片作用域，在这之后的<strong>Local</strong> 变量都会被纳入 <strong>V8</strong> 的内存管理，在代码运行结束后资源能够被 <strong>GC</strong> 回收，这是一个简化的操作，实现原理是通过生成实例时调用 <strong>enter</strong> 方法，然后再运行结束时 C++会自动调用<strong>析构函数</strong>，这时候调用 <strong>exit</strong> 方法，起到了自动管理的作用</p>
+<h3 id="NodeMainInstance-CreateMainEnvironment"><a href="#NodeMainInstance-CreateMainEnvironment" class="headerlink" title="NodeMainInstance::CreateMainEnvironment"></a>NodeMainInstance::CreateMainEnvironment</h3><p><img src="./image-20200318110708041.png" alt="image-20200318110708041"></p>
+<p><img src="./image-20200318110815452.png" alt="image-20200318110815452"></p>
+<p>这里根据 <strong>snapshot</strong> 初始化 <strong>context</strong> ，下面的 <strong>context_scope</strong> 作用同上，其中的<strong>context</strong> 会被注入到 <strong>JS</strong> 中作为全局的 <strong>global</strong> 对象</p>
+<p><img src="./image-20200318111731346.png" alt="image-20200318111731346"></p>
+<p>生成指向 <strong>Environment</strong> 的指针，这个时候会实例化 <strong>Environment</strong>，然后生成 <strong>node</strong> 中的 <strong>process</strong> 和 <strong>primordials</strong> 对象，准备注入到 <strong>Js</strong> 中</p>
+<p>接下来开始初始化 <strong>libuv</strong> 和 诊断相关的逻辑</p>
+<p><img src="./image-20200318114432240.png" alt="image-20200318114432240"></p>
+<p>注册不同阶段的 <strong>handle</strong></p>
+<h3 id="Environment-RunBootstrapping"><a href="#Environment-RunBootstrapping" class="headerlink" title="Environment::RunBootstrapping"></a>Environment::RunBootstrapping</h3><p><img src="./image-20200318114840841.png" alt="image-20200318114840841"></p>
+<p><img src="./image-20200318122035496.png" alt="image-20200318122035496"></p>
+<p>运行 <strong>JS</strong> 代码，<strong>lib/internal</strong> 中的 <strong>loaders</strong> 和 <strong>node</strong></p>
+<p><img src="./image-20200318115113607.png" alt="image-20200318115113607"></p>
+<p><strong>FIXED_ONE_BYTE_STRING</strong> 作用是将 <strong>string</strong> 转换为 <strong>Local</strong></p>
+<p>运行 <strong>internal/bootstrap/loaders</strong> 文件的逻辑，同时注入 <strong>process</strong> ，<strong>getLinkedBinding</strong>，<strong>getInternalBinding</strong>，<strong>primordials</strong>，这样在 <strong>Js</strong> 文件内部就可以访问到</p>
+<p><strong>loader_exports</strong> 返回的是 <strong>JS</strong> 文件中 <strong>return</strong> 的 <strong>loader_exports</strong> 对象，包括 <strong>require</strong> 方法， <strong>internalBinding</strong> 方法</p>
+<p><strong>EscapableHandleScope</strong> 的作用是用来要把内部的 <strong>Local</strong> 类型往外返回的时候，避免被 <strong>v8</strong> 回收</p>
+<p><img src="./image-20200318115840921.png" alt="image-20200318115840921"></p>
+<p><img src="./image-20200318115900680.png" alt="image-20200318115900680"></p>
+<p>执行 <strong>ExecuteBootstrapper</strong> 中的 <strong>NativeModuleEnv::LookupAndCompile</strong> 拿到 <strong>JS</strong> 的内容后，调用 <strong>-&gt;Call</strong> 进行调用</p>
+<p><img src="./image-20200318120141916.png" alt="image-20200318120141916"></p>
+<p><img src="./image-20200318120315197.png" alt="image-20200318120315197"></p>
+<p><img src="./image-20200318120639781.png" alt="image-20200318120639781"></p>
+<p><strong>LoadBuiltinModuleSource</strong> 中根据 <strong>Id</strong> ，即路径名查询， <strong>source_</strong> 中是提前嵌入的 <strong>lib</strong> 下的 <strong>Js</strong> 文件，如果命中则直接将对应的字符串赋值给 <strong>source</strong>，然后将文件的基本信息保存在 <strong>origin</strong> 中</p>
+<p>利用 <strong>ScriptCompiler::CompileFunctionInContext</strong> 注入 <strong>Context</strong>，<strong>然后缓存到 code<em>cache</em></strong></p>
+<p><img src="./image-20200318121845353.png" alt="image-20200318121845353"></p>
+<p>注入 <strong>process.env</strong></p>
+<p>至此 <strong>env-&gt;RunBootstrapping()</strong> 完成，<strong>CreateMainEnvironment</strong> 结束</p>
+<p><img src="./image-20200318122321385.png" alt="image-20200318122321385"></p>
+<p><img src="./image-20200318122509396.png" alt="image-20200318122509396"></p>
+<p>调用 <strong>LoadEnvironment</strong> 装载环境，根据不同的命令行参数运行不同的 <strong>JS</strong>文件，一般情况下，<strong>internal/main/run_main_module</strong></p>
+<p><img src="./image-20200318122657817.png" alt="image-20200318122657817"></p>
+<p><img src="./image-20200318122751188.png" alt="image-20200318122751188"></p>
+<p>最后运行 <strong>uv_run</strong> ，启动 <strong>event loop</strong>，如果没有 <strong>active handle</strong> ，那么就准备释放资源和退出程序</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/frontend/" rel="tag"># frontend</a>
+          
+            <a href="/tags/node/" rel="tag"># node</a>
+          
+            <a href="/tags/v8/" rel="tag"># v8</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/post-15/" rel="next" title="说说 Generator">
+                <i class="fa fa-chevron-left"></i> 说说 Generator
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">charliemei</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                友情链接
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://kalasearch.cn" title="卡拉搜索" target="_blank">卡拉搜索</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#从入口开始"><span class="nav-number">1.</span> <span class="nav-text">从入口开始</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#InitializeOncePerProcess"><span class="nav-number">1.1.</span> <span class="nav-text">InitializeOncePerProcess</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PlatformInit"><span class="nav-number">1.2.</span> <span class="nav-text">PlatformInit</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#uv-setup-args"><span class="nav-number">1.3.</span> <span class="nav-text">uv_setup_args</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#InitializeNodeWithArgs"><span class="nav-number">1.4.</span> <span class="nav-text">InitializeNodeWithArgs</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RegisterBuiltinModules"><span class="nav-number">1.5.</span> <span class="nav-text">RegisterBuiltinModules</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#InitializeCodeCache"><span class="nav-number">1.6.</span> <span class="nav-text">InitializeCodeCache</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#per-process-v8-platform-Initialize"><span class="nav-number">1.7.</span> <span class="nav-text">per_process::v8_platform.Initialize</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#v8-V8-InitializePlatform"><span class="nav-number">1.8.</span> <span class="nav-text">v8::V8::InitializePlatform</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#V8-Initialize"><span class="nav-number">1.9.</span> <span class="nav-text">V8::Initialize</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#v8-internal-V8-InitializeOncePerProcess"><span class="nav-number">1.10.</span> <span class="nav-text">v8::internal::V8::InitializeOncePerProcess</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#V8-InitializeOncePerProcessImpl"><span class="nav-number">1.11.</span> <span class="nav-text">V8::InitializeOncePerProcessImpl</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Node-Start"><span class="nav-number">1.12.</span> <span class="nav-text">Node::Start</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#main-instance"><span class="nav-number">1.13.</span> <span class="nav-text">main_instance</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NodeMainInstance-Run"><span class="nav-number">1.14.</span> <span class="nav-text">NodeMainInstance::Run</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NodeMainInstance-CreateMainEnvironment"><span class="nav-number">1.15.</span> <span class="nav-text">NodeMainInstance::CreateMainEnvironment</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Environment-RunBootstrapping"><span class="nav-number">1.16.</span> <span class="nav-text">Environment::RunBootstrapping</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">charliemei</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
